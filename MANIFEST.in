@@ -1,0 +1,2 @@
+include twiml_generator/languages_specs/*.json
+include twiml_generator/xsd/*.xsd

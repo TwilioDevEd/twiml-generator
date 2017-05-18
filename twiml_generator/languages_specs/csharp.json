@@ -1,0 +1,28 @@
+{
+  "language": "csharp",
+  "extension": ".cs",
+
+  "voice_class": "VoiceResponse",
+  "messaging_class": "MessagingResponse",
+
+  "text_format": "\"{text}\", ",
+  "attribute_format": "{name}: {value}",
+  "use_semicolon": true,
+  "append": "{parent}.{klass}({variable});",
+  "chain_calls": false,
+
+
+  "declare_class": true,
+  "method_name_style": "camelize",
+  "class_wrapper_padding": 6,
+  "class_wrapper": "\n\npublic class {classname}\n{{\n   public static void Main()\n   {{\n{code}\n   }}\n}}",
+
+  "add_imports": "fixed",
+  "import_voice": "using Twilio.TwiML;",
+  "import_messaging": "using Twilio.TwiML;",
+  "new_variable": "var {variable} = new {klass}({text}{attributes});",
+  "new_leaf": "{parent}.{method}({text}{attributes});",
+  "chained_append": ".{variable}({variable})",
+  "print": "System.Console.WriteLine(response.ToString());",
+  "string_quote": "\""
+}

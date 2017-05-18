@@ -1,0 +1,36 @@
+{
+  "language": "java",
+  "extension": ".java",
+  
+  "voice_class": "VoiceResponse",
+  "messaging_class": "MessagingResponse",
+
+  "text_format": "\"{text}\"",
+  "attribute_format": ".{name}({value})",
+  "attribute_join": "",
+  "use_semicolon": true,
+  "chain_calls": false,
+
+  "declare_class": true,
+  "method_name_style": "",
+  "class_wrapper_padding": 8,
+  "class_wrapper": "{imports}\n\npublic class {classname} {{\n    public static void main(String[] args) {{\n{code}\n    }}\n}}",
+
+  "add_imports": "multiple_lines",
+  "reverse_build": true,
+  "necessary_imports": ["TwiMLException", "Method"],
+  "import_voice": "import com.twilio.twiml.{imports};",
+  "import_messaging": "import com.twilio.twiml.{imports};",
+  "new_variable": "{klass} {variable} = new {klass}.Builder({text}){attributes}{appends}.build();",
+  "new_leaf": "{klass} {variable} = new {klass}.Builder({text}){attributes}.build();",
+  "chained_append": ".{variable}({variable})",
+  "print": "try {\n    System.out.println(response.toXml());\n} catch (TwiMLException e) {\n    e.printStackTrace();\n}",
+  "string_quote": "\"",
+  "attributes_map": {
+    "method": {
+      "GET": "Method.GET",
+      "POST": "Method.POST"
+    }
+  },
+  "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};"
+}

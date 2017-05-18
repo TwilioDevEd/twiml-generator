@@ -1,0 +1,22 @@
+{
+  "language": "node",
+  "extension": ".js",
+  
+  "voice_class": "VoiceResponse",
+  "messaging_class": "MessagingResponse",
+
+  "text_format": ", '{text}'",
+  "attribute_format": "{name}: {value}",
+  "attributes_wrapper_format": "{{{attributes}}}",
+  "use_semicolon": true,
+  "chain_calls": false,
+
+  "add_imports": "fixed",
+  "import_voice": "const VoiceResponse = require('twilio').twiml.VoiceResponse;",
+  "import_messaging": "const MessagingResponse = require('twilio').twiml.MessagingResponse;",
+  "new_variable": "const {variable} = new {klass}({attributes});",
+  "new_block": "const {variable} = {parent}.{variable}({attributes});",
+  "new_leaf": "{parent}.{method}({attributes}{text});",
+  "append": "",
+  "print": "console.log(response.toString());"
+}
