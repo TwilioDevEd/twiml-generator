@@ -158,7 +158,7 @@ class TwimlCodeGenerator(object):
         if self.language_spec.get('code_wrapper'):
             return self.language_spec['code_wrapper'].format(
                 imports=self.output_imports(),
-                classname=camelize(str(self.code_filepath.name)[:-len(self.language_spec['extension'])]),
+                classname=camelize(underscore(str(self.twiml_filepath.name)[:-4])),
                 code=self.output_padded_code(lines),
                 print=self.output_padded_code(self.output_print().split('\n'))
             )
