@@ -14,8 +14,8 @@
 
   "declare_class": true,
   "method_name_style": "camelize",
-  "code_wrapper_padding": 6,
-  "code_wrapper": "{imports}\n\npublic class {classname}\n{{\n   public static void Main()\n   {{\n{code}\n{print}   }}\n}}",
+  "code_wrapper_padding": 8,
+  "code_wrapper": "{imports}\n\npublic class {classname}\n{{\n    public static void Main()\n    {{\n{code}\n{print}    }}\n}}\n",
 
   "add_imports": "fixed",
   "import_voice": "using Twilio.TwiML;",

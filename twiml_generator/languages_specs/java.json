@@ -11,7 +11,7 @@
 
   "method_name_style": "",
   "code_wrapper_padding": 8,
-  "code_wrapper": "{imports}\n\npublic class {classname} {{\n    public static void main(String[] args) {{\n{code}\n{print}    }}\n}}",
+  "code_wrapper": "{imports}\n\npublic class {classname} {{\n    public static void main(String[] args) {{\n{code}\n{print}    }}\n}}\n",
 
   "add_imports": "multiple_lines",
   "reverse_build": true,
