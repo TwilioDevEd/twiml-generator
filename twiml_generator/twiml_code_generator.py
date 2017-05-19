@@ -63,10 +63,11 @@ class TwimlCodeGenerator(object):
                 lines.append(self.output_new_variable(verb))
             elif event == 'leaf':
                 lines.append(self.output_new_leaf(verb))
-            elif event == 'end':
-                lines.append(self.output_append(verb))
-        lines.append(self.output_print())
-        return '\n'.join([self.output_imports(), self.output_wrapper('\n'.join(lines))])
+            elif event == 'end' and verb.parent:
+                append_line = self.output_append(verb)
+                if append_line != '':
+                    lines.append(append_line)
+        return self.output_wrapper(lines)
 
     def __reverse_repr__(self):
         lines = []
@@ -75,8 +76,7 @@ class TwimlCodeGenerator(object):
                 lines.append(self.output_new_leaf(verb))
             else:
                 lines.append(self.output_new_variable(verb))
-        lines.append(self.output_print())
-        return '\n'.join([self.output_imports(), self.output_wrapper('\n'.join(lines))])
+        return self.output_wrapper(lines)
 
     def output_imports(self):
         """Return a string containing the imports lines for the code."""
@@ -93,12 +93,12 @@ class TwimlCodeGenerator(object):
             imports = [verb if verb != 'Response' else self.class_for_verb_name(verb) for verb in imports]
             return self.language_spec[import_kind].format(
                 imports=', '.join(imports)
-            )
+            ) + '\n'
         elif self.language_spec.get('add_imports') == 'multiple_lines':
             imports = [verb if verb != 'Response' else self.class_for_verb_name(verb) for verb in imports]
-            return '\n'.join([self.language_spec[import_kind].format(imports=i) for i in imports])
+            return '\n'.join([self.language_spec[import_kind].format(imports=i) for i in imports]) + '\n'
         else:
-            return self.language_spec[import_kind]
+            return self.language_spec[import_kind] + '\n'
 
     def output_new_variable(self, verb, appends=None):
         """Return a string to create a new tag that will contain other verbs."""
@@ -143,29 +143,31 @@ class TwimlCodeGenerator(object):
 
     def output_append(self, verb):
         """Return a string to append a verb to its parent."""
-        if verb.parent:
-            return self.language_spec['append'].format(
-                parent=self.variable_for_verb(verb.parent),
-                klass=self.class_for_verb(verb),
-                variable=self.variable_for_verb(verb)
-            )
-        else:
-            return ''
+        return self.language_spec['append'].format(
+            parent=self.variable_for_verb(verb.parent),
+            klass=self.class_for_verb(verb),
+            variable=self.variable_for_verb(verb)
+        )
 
     def output_print(self):
         """Return a string to print the TwiML result in the code."""
         return self.language_spec['print']
 
-    def output_wrapper(self, code):
-        """Used to wrap code, without imports, in a class definition."""
-        if self.language_spec.get('class_wrapper'):
-            return self.language_spec['class_wrapper'].format(
-                imports='',
+    def output_wrapper(self, lines):
+        """Used to wrap code, structure imports and print out function in a single file."""
+        if self.language_spec.get('code_wrapper'):
+            return self.language_spec['code_wrapper'].format(
+                imports=self.output_imports(),
                 classname=camelize(str(self.code_filepath.name)[:-len(self.language_spec['extension'])]),
-                code='\n'.join([' ' * self.language_spec['class_wrapper_padding'] + line for line in code.split('\n')])
+                code=self.output_padded_code(lines),
+                print=self.output_padded_code(self.output_print().split('\n'))
             )
         else:
             return code
+
+    def output_padded_code(self, lines):
+        """Return a string containing all the lines left padded accordingly."""
+        return '\n'.join([' ' * self.language_spec['code_wrapper_padding'] + line for line in lines]) + '\n'
 
     def variable_for_verb(self, verb):
         """Return a formated variable name for a given verb."""
@@ -201,7 +203,10 @@ class TwimlCodeGenerator(object):
         """Return the text quoted for the language."""
         if not verb.text:
             return ''
-        text = self.language_spec['text_format'].format(text=verb.text)
+        quote = self.language_spec.get('string_quote', "'")
+        text = self.language_spec['text_format'].format(
+            text=quote + verb.text.replace(quote, '\\' + quote) + quote
+        )
         if len(verb.attributes) == 0:
             if text.startswith(', '):
                 text = text[2:]

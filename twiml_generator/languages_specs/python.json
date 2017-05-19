@@ -5,10 +5,12 @@
   
   "voice_class": "VoiceResponse",
   "messaging_class": "MessagingResponse",
-  "text_format": "'{text}', ",
+  "text_format": "{text}, ",
   "attribute_name_style": "underscore",
   "attribute_format": "{name}={value}",
   "chain_calls": false,
+  "code_wrapper": "{imports}\n{code}\n{print}",
+  "code_wrapper_padding": 0,
 
   "add_imports": "single_line",
   "import_voice": "from twilio.twiml.voice_response import {imports}",

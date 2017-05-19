@@ -5,16 +5,13 @@
   "voice_class": "VoiceResponse",
   "messaging_class": "MessagingResponse",
 
-  "text_format": "\"{text}\"",
+  "text_format": "{text}",
   "attribute_format": ".{name}({value})",
   "attribute_join": "",
-  "use_semicolon": true,
-  "chain_calls": false,
 
-  "declare_class": true,
   "method_name_style": "",
-  "class_wrapper_padding": 8,
-  "class_wrapper": "{imports}\n\npublic class {classname} {{\n    public static void main(String[] args) {{\n{code}\n    }}\n}}",
+  "code_wrapper_padding": 8,
+  "code_wrapper": "{imports}\n\npublic class {classname} {{\n    public static void main(String[] args) {{\n{code}\n{print}    }}\n}}",
 
   "add_imports": "multiple_lines",
   "reverse_build": true,

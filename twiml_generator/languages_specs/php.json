@@ -5,11 +5,13 @@
   "voice_class": "Twiml",
   "messaging_class": "Twiml",
 
-  "text_format": "'{text}', ",
+  "text_format": "{text}, ",
   "attribute_format": "'{name}' => {value}",
   "attributes_wrapper_format": "[{attributes}]",
   "use_semicolon": true,
   "chain_calls": false,
+  "code_wrapper": "{imports}\n{code}\n{print}",
+  "code_wrapper_padding": 0,
 
   "add_imports": "fixed",
   "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\Twiml;",
