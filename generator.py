@@ -4,7 +4,7 @@ from twiml_code_generator import TwimlCodeGenerator
 
 
 if __name__ == '__main__':
-    code_generator = TwimlCodeGenerator('assets/message_media.xml', language='java')
+    code_generator = TwimlCodeGenerator('assets/message_media.xml', language='python')
     code_generator.write_code()
     code_generator.verify()
     print('')
