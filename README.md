@@ -15,6 +15,14 @@ A tool to help generate sample code for creating TwiML with Twilio's helper libr
 | PHP | 5.x |
 | Python | 6.x |
 
+## Using the tool
+
+You can use `./generator.py` to print out code from a TwiML file
+
+```bash
+$ ./generator.py assets/call_on_hold.xml -l python
+```
+
 ## Using it as a Library
 
 A small example on how to use it as a library in your Python code:

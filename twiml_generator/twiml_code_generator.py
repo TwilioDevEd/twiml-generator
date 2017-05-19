@@ -30,7 +30,7 @@ class TwimlCodeGenerator(object):
 
     def __init__(self, twiml_filepath, code_filepath=None, language='python'):
         self.language_spec = load_language_spec(language)
-        self.twiml_filepath = twiml_filepath
+        self.twiml_filepath = Path(twiml_filepath)
         self.twimlir = TwimlIR(twiml_filepath)
         if not code_filepath:
             self.code_filepath = self.get_code_filepath()
@@ -44,7 +44,7 @@ class TwimlCodeGenerator(object):
 
     def get_code_filepath(self):
         """Return a path for the generator file to be written."""
-        filepath = Path(self.twiml_filepath).resolve()
+        filepath = self.twiml_filepath.resolve()
         generators_dirpath = filepath.parent.parent / 'generators'
         generators_dirpath.mkdir(exist_ok=True)
         language_dirpath = generators_dirpath / self.language_spec['language']
@@ -271,7 +271,7 @@ class TwimlCodeGenerator(object):
         logger.debug('Running: {} {}'.format(self.language_spec['language'], str(self.code_filepath)))
         p = subprocess.run([self.language_spec['language'], str(self.code_filepath)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if p.returncode == 0:
-            old_tree = etree.parse(self.twiml_filepath, parser)
+            old_tree = etree.parse(str(self.twiml_filepath), parser)
             new_tree = etree.fromstring(p.stdout, parser)
             print('OLD:\n' + etree.tostring(old_tree, encoding='utf-8', pretty_print=True).decode())
             print('NEW:\n' + etree.tostring(new_tree, encoding='utf-8', pretty_print=True).decode())

@@ -1,12 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
-from twiml_code_generator import TwimlCodeGenerator
+from twiml_generator import TwimlCodeGenerator
+import argparse
 
 
 if __name__ == '__main__':
-    code_generator = TwimlCodeGenerator('assets/message_media.xml', language='python')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("twiml_filepath", help="Path to a TwiML file")
+    parser.add_argument("-l", "--language", help="Language for the code to generate",
+                        choices=['csharp', 'java', 'node', 'php', 'python'])
+    args = parser.parse_args()
+
+    code_generator = TwimlCodeGenerator(args.twiml_filepath, language=args.language)
     code_generator.write_code()
-    code_generator.verify()
+    if args.language in ['node', 'php', 'python']:
+        code_generator.verify()
+
     print('')
     print(' CODE GENERATED '.center(80, '='))
     print(code_generator)
