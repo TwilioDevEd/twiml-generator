@@ -264,6 +264,13 @@ class TwimlCodeGenerator(object):
         if self.code_filepath.exists():
             self.code_filepath.unlink()
         self.code_filepath.write_text(str(self), encoding='utf-8')
+        self.format_code()
+
+    def format_code(self):
+        if 'formatter' not in self.language_spec:
+            return
+        format_cmd = self.language_spec['formatter'].format(filepath=str(self.code_filepath))
+        subprocess.run([format_cmd], shell=True)
 
     def verify(self):
         """Try to run the code and verify its output against the original TwiML."""

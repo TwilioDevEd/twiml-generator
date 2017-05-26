@@ -18,5 +18,6 @@
   "new_variable": "{variable} = {klass}({attributes})",
   "new_leaf": "{parent}.{method}({text}{attributes})",
   "append": "{parent}.append({variable})",
-  "print": "print(response)"
+  "print": "print(response)",
+  "formatter": "yapf -i {filepath}"
 }

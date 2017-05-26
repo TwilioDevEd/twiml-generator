@@ -11,6 +11,7 @@ setup(name='twiml-generator',
       include_package_data=True,
       install_requires=[
           'lxml',
-          'inflection'
+          'inflection',
+          'yapf'
       ],
       zip_safe=False)
