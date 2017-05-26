@@ -173,10 +173,18 @@ class TwimlCodeGenerator(object):
         """Return a formated variable name for a given verb."""
         if not verb:
             return ''
-        elif self.language_spec.get('variable_name_style') == 'camelize':
-            return camelize(verb.name)
-        else:
-            return verb.name.lower()
+        elif not verb.variable_name:
+            if self.language_spec.get('variable_name_style') == 'camelize':
+                variable_name = camelize(verb.name)
+            else:
+                variable_name = verb.name.lower()
+            number = 1
+            verb.variable_name = variable_name
+            while verb.variable_name in self.twimlir.generated_variables_names:
+                number += 1
+                verb.variable_name = variable_name + str(number)
+            self.twimlir.generated_variables_names.add(verb.variable_name)
+        return verb.variable_name
 
     def method_for_verb(self, verb):
         """Return a formated method name for a given verb."""

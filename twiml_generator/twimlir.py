@@ -49,6 +49,7 @@ class TwimlIR(object):
         self.twiml_attributes_types = TwimlAttributesTypes()
         self.response = None
         self.is_voice_response = True
+        self.generated_variables_names = set()
 
         logger.debug('Parsing XML: {}'.format(self.xml_filepath))
         self.parse_xml()
@@ -171,6 +172,7 @@ class TwimlIRVerb(object):
         self.depth = 0
         if self.parent:
             self.depth = self.parent.depth + 1
+        self.variable_name = None
 
     def __repr__(self):
         attributes_string = ' '.join(
