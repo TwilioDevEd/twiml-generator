@@ -20,5 +20,6 @@
   "new_block": "const {variable} = {parent}.{variable}({attributes});",
   "new_leaf": "{parent}.{method}({attributes}{text});",
   "append": "",
-  "print": "console.log(response.toString());"
+  "print": "console.log(response.toString());",
+  "formatter": "js-beautify -r {filepath}"
 }

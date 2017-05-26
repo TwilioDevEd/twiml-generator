@@ -12,6 +12,7 @@ setup(name='twiml-generator',
       install_requires=[
           'lxml',
           'inflection',
-          'yapf'
+          'yapf',
+          'jsbeautifier'
       ],
       zip_safe=False)
