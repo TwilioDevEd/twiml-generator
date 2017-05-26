@@ -41,6 +41,8 @@ class TwimlCodeGenerator(object):
 
         if language == 'java':
             self.clean_java_specificities()
+        elif language == 'python':
+            self.clean_python_specificities()
 
     def get_code_filepath(self):
         """Return a path for the generator file to be written."""
@@ -255,6 +257,7 @@ class TwimlCodeGenerator(object):
         if self.language_spec.get('chained_append'):
             return ''.join(
                 [self.language_spec['chained_append'].format(
+                    method=self.method_for_verb(v),
                     variable=self.variable_for_verb(v))
                     for v in verb.children])
         else:
@@ -266,6 +269,12 @@ class TwimlCodeGenerator(object):
             if verb.name == 'Redirect':
                 verb.attributes['url'] = verb.text
                 verb.text = None
+
+    def clean_python_specificities(self):
+        """Python library specificities which requires to change the TwiML IR."""
+        for verb, event in self.twimlir:
+            if 'from' in verb.attributes:
+                verb.attributes['from_'] = verb.attributes.pop('from')
 
     def write_code(self):
         """Write the code in the generator file."""
