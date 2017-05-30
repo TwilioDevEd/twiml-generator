@@ -44,6 +44,9 @@ class TwimlCodeGenerator(object):
         elif language == 'python':
             self.clean_python_specificities()
 
+    def overwrite_language_spec(self, key, value):
+        self.language_spec[key] = value
+
     def get_code_filepath(self):
         """Return a path for the generator file to be written."""
         filepath = self.twiml_filepath.resolve()
