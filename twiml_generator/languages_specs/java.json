@@ -15,7 +15,7 @@
 
   "add_imports": "multiple_lines",
   "reverse_build": true,
-  "necessary_imports": ["TwiMLException", "Method"],
+  "necessary_imports": ["TwiMLException", "Method", "Event"],
   "import_voice": "import com.twilio.twiml.{imports};",
   "import_messaging": "import com.twilio.twiml.{imports};",
   "new_variable": "{klass} {variable} = new {klass}.Builder({text}){attributes}{appends}.build();",
@@ -27,6 +27,13 @@
     "method": {
       "GET": "Method.GET",
       "POST": "Method.POST"
+    },
+    "statusCallbackMethod": {
+      "GET": "Method.GET",
+      "POST": "Method.POST"
+    },
+    "statusCallbackEvents": {
+      ""
     }
   },
   "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};"

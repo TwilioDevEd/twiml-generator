@@ -9,11 +9,12 @@ from lxml import etree
 from inflection import underscore, camelize
 
 from .twimlir import TwimlIR
+from .twimlir import TwimlIRVerb
 
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 def load_language_spec(language):
@@ -271,6 +272,12 @@ class TwimlCodeGenerator(object):
         for verb, event in self.twimlir:
             if verb.name == 'Redirect':
                 verb.attributes['url'] = verb.text
+                verb.text = None
+            elif verb.name == 'Dial':
+                verb.add_child('Number', verb.text)
+                verb.text = None
+            elif verb.name == 'Message':
+                verb.add_child('Body', verb.text)
                 verb.text = None
 
     def clean_python_specificities(self):

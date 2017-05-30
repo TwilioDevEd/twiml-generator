@@ -8,7 +8,7 @@ from pathlib import Path
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 class TwimlAttributesTypes(dict):
@@ -92,7 +92,6 @@ class TwimlIR(object):
 
             elif event == 'end':
                 logger.debug('End event on verb : {}'.format(twiml_verb.tag))
-                latest_verb.is_leaf = (len(latest_verb.children) == 0)
                 latest_verb = latest_verb.parent
                 if latest_verb:
                     logger.debug('Set Latest Verb Seen as : {}'.format(latest_verb.name))
@@ -157,6 +156,9 @@ class TwimlIR(object):
         return sorted(list(verb_names))
 
 
+
+
+
 class TwimlIRVerb(object):
     """Internal Representation of a TwiML verb."""
 
@@ -167,12 +169,15 @@ class TwimlIRVerb(object):
         self.parent = parent
 
         self.children = []
-        self.is_leaf = True
 
         self.depth = 0
         if self.parent:
             self.depth = self.parent.depth + 1
         self.variable_name = None
+
+    @property
+    def is_leaf(self):
+        return len(self.children) == 0
 
     def __repr__(self):
         attributes_string = ' '.join(
@@ -186,6 +191,15 @@ class TwimlIRVerb(object):
             attributes_string=attributes_string,
             text_string=text_string
         )
+
+    def add_child(self, name, text):
+        newVerb = TwimlIRVerb(
+                    name=name,
+                    attributes={},
+                    text=text,
+                    parent=self
+                )
+        self.children.append(newVerb)
 
     @property
     def siblings(self):
