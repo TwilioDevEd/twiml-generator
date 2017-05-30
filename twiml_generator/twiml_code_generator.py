@@ -40,6 +40,7 @@ class TwimlCodeGenerator(object):
         else:
             self.code_filepath = code_filepath
 
+        self.specific_imports = set()
         if language == 'java':
             self.clean_java_specificities()
         elif language == 'python':
@@ -102,7 +103,10 @@ class TwimlCodeGenerator(object):
             ) + '\n'
         elif self.language_spec.get('add_imports') == 'multiple_lines':
             imports = [verb if verb != 'Response' else self.class_for_verb_name(verb) for verb in imports]
-            return '\n'.join([self.language_spec[import_kind].format(imports=i) for i in imports]) + '\n'
+            imports = '\n'.join([self.language_spec[import_kind].format(imports=i) for i in imports]) + '\n'
+            if len(self.specific_imports) > 0:
+                imports += '\n'.join(self.specific_imports)
+            return imports
         else:
             return self.language_spec[import_kind] + '\n'
 
@@ -251,6 +255,8 @@ class TwimlCodeGenerator(object):
             elif isinstance(value, str) and self.language_spec.get('string_quote'):
                 quote = self.language_spec['string_quote']
                 value = quote + value + quote
+            elif isinstance(value, bytes):
+                value = value.decode('utf-8')
             else:
                 value = repr(value)
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
@@ -273,12 +279,20 @@ class TwimlCodeGenerator(object):
             if verb.name == 'Redirect':
                 verb.attributes['url'] = verb.text
                 verb.text = None
-            elif verb.name == 'Dial':
+            elif verb.name == 'Dial' and verb.text:
                 verb.add_child('Number', verb.text)
                 verb.text = None
-            elif verb.name == 'Message':
+            elif verb.name == 'Message' and verb.text:
                 verb.add_child('Body', verb.text)
                 verb.text = None
+            elif verb.name == 'Client':
+                if 'statusCallbackEvent' in verb.attributes:
+                    verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(', '.join(
+                        ['Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')])
+                    ).encode()
+                    verb.attributes.pop('statusCallbackEvent')
+                    self.specific_imports.add('import java.util.Arrays;')
+                    self.specific_imports.add('import com.twilio.twiml.Event;')
 
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""

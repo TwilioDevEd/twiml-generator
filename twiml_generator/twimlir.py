@@ -156,9 +156,6 @@ class TwimlIR(object):
         return sorted(list(verb_names))
 
 
-
-
-
 class TwimlIRVerb(object):
     """Internal Representation of a TwiML verb."""
 
@@ -194,11 +191,11 @@ class TwimlIRVerb(object):
 
     def add_child(self, name, text):
         newVerb = TwimlIRVerb(
-                    name=name,
-                    attributes={},
-                    text=text,
-                    parent=self
-                )
+            name=name,
+            attributes={},
+            text=text,
+            parent=self
+        )
         self.children.append(newVerb)
 
     @property
