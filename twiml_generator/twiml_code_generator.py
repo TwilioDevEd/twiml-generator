@@ -132,7 +132,7 @@ class TwimlCodeGenerator(object):
 
     def output_new_leaf(self, verb):
         """Return a string for adding a simple verb to a parent."""
-        if self.language_spec['language'] == 'java' and verb.name in ['Body', 'Media']:
+        if self.language_spec['language'] == 'java' and verb.name in ['Body', 'Media', 'Hangup', 'Leave']:
             return self.language_spec['new_leaf_no_builder'].format(
                 parent=self.variable_for_verb(verb.parent),
                 method=self.method_for_verb(verb),
