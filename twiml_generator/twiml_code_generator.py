@@ -293,6 +293,9 @@ class TwimlCodeGenerator(object):
                     verb.attributes.pop('statusCallbackEvent')
                     self.specific_imports.add('import java.util.Arrays;')
                     self.specific_imports.add('import com.twilio.twiml.Event;')
+            for name, value in verb.attributes:
+                if verb.attributes[name] in ['true', 'false}:
+                    verb.attributes[name] = verb.attributes[name].encode()
 
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""
