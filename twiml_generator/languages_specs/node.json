@@ -10,7 +10,7 @@
   "attributes_wrapper_format": "{{{attributes}}}",
   "use_semicolon": true,
   "chain_calls": false,
-  "code_wrapper": "{imports}\n{code}\n{print}\n",
+  "code_wrapper": "{imports}\n{code}\n{print}",
   "code_wrapper_padding": 0,
 
   "add_imports": "fixed",
@@ -21,6 +21,6 @@
   "new_leaf": "{parent}.{method}({attributes}{text});",
   "append": "",
   "print": "console.log(response.toString());",
-  "formatter": "js-beautify -r {filepath}",
+  "formatter": "js-beautify -n -r {filepath}",
   "use_boolean": true
 }
