@@ -10,7 +10,7 @@
   "attributes_wrapper_format": "{{{attributes}}}",
   "use_semicolon": true,
   "chain_calls": false,
-  "code_wrapper": "{imports}\n{code}\n{print}",
+  "code_wrapper": "{imports}\n{code}\n{print}\n",
   "code_wrapper_padding": 0,
 
   "add_imports": "fixed",
