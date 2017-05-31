@@ -24,5 +24,12 @@
   "new_leaf": "{parent}.{method}({text}{attributes});",
   "chained_append": ".{method}({variable})",
   "print": "System.Console.WriteLine(response.ToString());",
-  "string_quote": "\""
+  "string_quote": "\"",
+  "attributes_map": {
+    "beep": {
+      "true": "\"true\"",
+      "false": "\"false\""
+    }
+  },
+  "use_boolean": true
 }

@@ -45,6 +45,8 @@ class TwimlCodeGenerator(object):
             self.clean_java_specificities()
         elif language == 'python':
             self.clean_python_specificities()
+        elif language == 'csharp':
+            self.clean_csharp_specificities()
 
     def overwrite_language_spec(self, key, value):
         self.language_spec[key] = value
@@ -221,6 +223,8 @@ class TwimlCodeGenerator(object):
         """Return the text quoted for the language."""
         if not verb.text:
             return ''
+        if verb.text == ' ':
+            verb.text = ''
         quote = self.language_spec.get('string_quote', "'")
         text = self.language_spec['text_format'].format(
             text=quote + verb.text.replace(quote, '\\' + quote) + quote
@@ -343,6 +347,15 @@ class TwimlCodeGenerator(object):
             for name, value in verb.attributes.items():
                 if value in ['true', 'false']:
                     verb.attributes[name] = camelize(value).encode('utf-8')
+
+    def clean_csharp_specificities(self):
+        """C# library specificities which requires to change the TwiML IR."""
+        for verb, event in self.twimlir:
+            if verb.name == 'Play' and not verb.text:
+                verb.text = ' '
+            elif verb.name == 'Redirect' and self.twimlir.is_messaging_response:
+                verb.attributes['url'] = verb.text
+                verb.text = None
 
     def write_code(self):
         """Write the code in the generator file."""
