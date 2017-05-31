@@ -33,5 +33,6 @@
       "POST": "Method.POST"
     }
   },
-  "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};"
+  "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};",
+  "use_boolean": true
 }

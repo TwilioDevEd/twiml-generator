@@ -8,7 +8,7 @@ from pathlib import Path
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class TwimlAttributesTypes(dict):
@@ -161,7 +161,7 @@ class TwimlIRVerb(object):
 
     def __init__(self, name, attributes, text, parent):
         self.name = name
-        self.attributes = attributes
+        self.attributes = dict(attributes)
         self.text = text
         self.parent = parent
 

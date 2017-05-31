@@ -17,9 +17,10 @@
   "import_voice": "const VoiceResponse = require('twilio').twiml.VoiceResponse;",
   "import_messaging": "const MessagingResponse = require('twilio').twiml.MessagingResponse;",
   "new_variable": "const {variable} = new {klass}({attributes});",
-  "new_block": "const {variable} = {parent}.{variable}({attributes});",
+  "new_block": "const {variable} = {parent}.{variable}({attributes}{text});",
   "new_leaf": "{parent}.{method}({attributes}{text});",
   "append": "",
   "print": "console.log(response.toString());",
-  "formatter": "js-beautify -r {filepath}"
+  "formatter": "js-beautify -r {filepath}",
+  "use_boolean": true
 }

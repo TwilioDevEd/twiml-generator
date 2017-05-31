@@ -17,7 +17,7 @@
   "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\Twiml;",
   "import_messaging": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\Twiml;",
   "new_variable": "${variable} = new {klass}({attributes});",
-  "new_block": "${variable} = ${parent}->{variable}({attributes});",
+  "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
   "new_leaf": "${parent}->{method}({text}{attributes});",
   "append": "",
   "print": "echo $response;"

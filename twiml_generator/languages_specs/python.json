@@ -15,7 +15,7 @@
   "add_imports": "single_line",
   "import_voice": "from twilio.twiml.voice_response import {imports}",
   "import_messaging": "from twilio.twiml.messaging_response import {imports}",
-  "new_variable": "{variable} = {klass}({attributes})",
+  "new_variable": "{variable} = {klass}({text}{attributes})",
   "new_leaf": "{parent}.{method}({text}{attributes})",
   "append": "{parent}.append({variable})",
   "print": "print(response)",
