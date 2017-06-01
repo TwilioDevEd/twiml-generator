@@ -13,11 +13,18 @@ if __name__ == '__main__':
 
     code_generator = TwimlCodeGenerator(args.twiml_filepath, language=args.language)
     code_generator.write_code()
-    if args.language in ['node', 'php', 'python']:
-        code_generator.verify()
-
-    print('')
     print(' CODE GENERATED '.center(80, '='))
     print(code_generator)
     print('=' * 80)
     print('Written at {}'.format(code_generator.code_filepath))
+    print('Running verification :', end='')
+    result, stdout, input_tree, output_tree = code_generator.verify()
+    if result == TwimlCodeGenerator.VERIFY_SUCCESS:
+        print(' \x1B[92m[passed]\x1B[39m')
+    elif result == TwimlCodeGenerator.VERIFY_FAILURE:
+        print(' \x1B[91m[failed]\x1B[39m')
+        print('INPUT:\n' + input_tree)
+        print('OUTPUT:\n' + output_tree)
+    else:
+        print(' \x1B[91m[error]\x1B[39m')
+        print(stdout)

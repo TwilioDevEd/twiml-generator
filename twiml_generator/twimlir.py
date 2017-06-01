@@ -78,7 +78,7 @@ class TwimlIR(object):
                 verb = TwimlIRVerb(
                     name=twiml_verb.tag,
                     attributes=self.clean_attributes(twiml_verb.tag, twiml_verb.attrib),
-                    text=self.clean_text(twiml_verb.text),
+                    text=self.__class__.clean_text(twiml_verb.text),
                     parent=latest_verb
                 )
                 if twiml_verb.tag == 'Message':
@@ -96,9 +96,10 @@ class TwimlIR(object):
                 if latest_verb:
                     logger.debug('Set Latest Verb Seen as : {}'.format(latest_verb.name))
 
-    def clean_text(self, text):
+    @staticmethod
+    def clean_text(text):
         """Remove unecessary blank space from the text and keep a newline in between."""
-        if text and text != '':
+        if text is not None and text != '':
             return '\\n'.join([line.strip() for line in text.strip().split('\n')])
 
     def clean_attributes(self, verb, attributes):

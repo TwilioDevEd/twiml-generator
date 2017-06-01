@@ -1,4 +1,5 @@
 generators
+lib
 
 # PHP Composer
 composer.json

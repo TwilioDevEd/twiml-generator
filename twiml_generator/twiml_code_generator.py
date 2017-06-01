@@ -2,6 +2,7 @@
 # coding: utf-8
 import json
 import logging
+import shutil
 import subprocess
 
 from pathlib import Path
@@ -29,7 +30,7 @@ def load_language_spec(language):
 class TwimlCodeGenerator(object):
     """Class to generate the necessary code for outputing a given TwiML."""
 
-    def __init__(self, twiml_filepath, code_filepath=None, language='python'):
+    def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python'):
         self.language_spec = load_language_spec(language)
         self.twiml_filepath = Path(twiml_filepath)
         self.twimlir = TwimlIR(twiml_filepath)
@@ -39,6 +40,11 @@ class TwimlCodeGenerator(object):
             self.code_filepath = Path(code_filepath)
         else:
             self.code_filepath = code_filepath
+
+        if lib_filepath:
+            self.lib_filepath = Path(lib_filepath)
+        else:
+            self.lib_filepath = Path(__file__).parent / '../lib'
 
         self.specific_imports = set()
         if language == 'java':
@@ -372,25 +378,127 @@ class TwimlCodeGenerator(object):
         format_cmd = self.language_spec['formatter'].format(filepath=str(self.code_filepath))
         subprocess.run([format_cmd], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    # Constants for verify result
+    VERIFY_SUCCESS = 0
+    VERIFY_FAILURE = 1
+    VERIFY_COMPILE_ERROR = 2
+
     def verify(self):
         """Try to run the code and verify its output against the original TwiML."""
         parser = etree.XMLParser(remove_blank_text=True, remove_comments=True, strip_cdata=True)
-        logger.debug('Running: {} {}'.format(self.language_spec['language'], str(self.code_filepath)))
-        p = subprocess.run([self.language_spec['language'], str(self.code_filepath)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if p.returncode == 0:
-            old_tree = etree.parse(str(self.twiml_filepath), parser)
-            new_tree = etree.fromstring(p.stdout, parser)
-            print('OLD:\n' + etree.tostring(old_tree, encoding='utf-8', pretty_print=True).decode())
-            print('NEW:\n' + etree.tostring(new_tree, encoding='utf-8', pretty_print=True).decode())
-            print('### OLD == NEW ? {} ###'.format(self.etree_element_eq(old_tree.getroot(), new_tree)))
+        if self.language_spec['language'] == 'java':
+            p = self.verify_java()
+        elif self.language_spec['language'] == 'csharp':
+            p = self.verify_csharp()
         else:
-            print(p.stderr.decode())
+            p = self.verify_generic()
+
+        if p.returncode == 0:
+            input_tree = etree.parse(str(self.twiml_filepath), parser)
+            output_tree = etree.fromstring(p.stdout, parser)
+            comparison_result = self.etree_element_eq(input_tree.getroot(), output_tree)
+            return (
+                TwimlCodeGenerator.VERIFY_SUCCESS if comparison_result else TwimlCodeGenerator.VERIFY_FAILURE,
+                '\n'.join([p.stdout.decode(), p.stderr.decode()]),
+                etree.tostring(input_tree, encoding='utf-8', pretty_print=True).decode(),
+                etree.tostring(output_tree, encoding='utf-8', pretty_print=True).decode()
+            )
+        else:
+            return (
+                TwimlCodeGenerator.VERIFY_COMPILE_ERROR,
+                '\n'.join([p.stdout.decode(), p.stderr.decode()]),
+                None,
+                None
+            )
+
+    def verify_generic(self):
+        generic_command = [self.language_spec['language'], str(self.code_filepath)]
+        logger.debug('Running: {}'.format(' '.join(generic_command)))
+        return subprocess.run(generic_command,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def verify_java(self):
+        if not shutil.which('java'):
+            raise Exception('You need to install java if you want to verify a java file')
+
+        example_filepath = Path('Example.java')
+        class_filepath = Path('Example.class')
+        jar_filepath = self.lib_filepath / 'twilio-7.11.0-jar-with-dependencies.jar'
+
+        def java_cleanup():
+            try:
+                example_filepath.unlink()
+                class_filepath.unlink()
+            except OSError:
+                pass
+
+        javac_command = ['javac', '-cp', str(jar_filepath), 'Example.java']
+        java_command = ['java', '-cp', str(jar_filepath) + ':', 'Example']
+
+        shutil.copy(str(self.code_filepath), str(example_filepath))
+
+        logger.debug('Running : {}'.format(' '.join(javac_command)))
+        p = subprocess.run(javac_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if p.returncode != 0:
+            java_cleanup()
+            return p
+
+        logger.debug('Running : {}'.format(' '.join(java_command)))
+        p = subprocess.run(java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        java_cleanup()
+        return p
+
+    def verify_csharp(self):
+        if not shutil.which('mono'):
+            raise Exception('You need to install mono if you want to verify a C# file')
+
+        app_filepath = Path('Example.app')
+        exe_filepath = Path('example.exe')
+
+        def csharp_clean():
+            try:
+                exe_filepath.unlink()
+                shutil.rmtree('Example.app')
+            except OSError:
+                pass
+
+        csharp_clean()
+
+        twilio_lib_filepath = self.lib_filepath / 'net35/Twilio.dll'
+        json_lib_filepath = self.lib_filepath / 'net35/Newtonsoft.Json.dll'
+        jwt_lib_filepath = self.lib_filepath / 'net35/JWT.dll'
+        libs_filepath = [twilio_lib_filepath, json_lib_filepath, jwt_lib_filepath]
+        libs_paths = ','.join([str(fp) for fp in libs_filepath])
+
+        mcs_command = ['mcs', '-r:' + libs_paths,
+                       '-out:' + str(exe_filepath), str(self.code_filepath)]
+        macpack_command = ['macpack', '-r:' + libs_paths,
+                           '-m:2', '-o:.', '-n:Example', '-a:' + str(exe_filepath)]
+        mono_command = ['mono', str(app_filepath / 'Contents/Resources/Example.exe')]
+
+        logger.debug('Running: {}'.format(' '.join(mcs_command)))
+        p = subprocess.run(mcs_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if p.returncode != 0:
+            csharp_clean()
+            return p
+
+        logger.debug('Running: {}'.format(' '.join(macpack_command)))
+        p = subprocess.run(macpack_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if p.returncode != 0:
+            csharp_clean()
+            return p
+
+        logger.debug('Running: {}'.format(' '.join(mono_command)))
+        p = subprocess.run(mono_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        csharp_clean()
+        return p
 
     def etree_element_eq(self, a, b):
         """Return True if two etree (a and b) are equal."""
         return (a.tag == b.tag
                 and a.tail == b.tail
                 and a.attrib == b.attrib
-                and (a.text.strip() == b.text.strip() if a.text and b.text else a.text == b.text)
+                and (TwimlIR.clean_text(a.text) == TwimlIR.clean_text(b.text)
+                     if a.text and b.text else a.text == b.text)
                 and len(a) == len(b)
                 and all(self.etree_element_eq(c1, c2) for c1, c2 in zip(a, b)))
