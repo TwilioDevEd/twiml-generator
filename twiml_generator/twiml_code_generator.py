@@ -256,6 +256,8 @@ class TwimlCodeGenerator(object):
                and self.language_spec['attributes_map'].get(name) \
                and self.language_spec['attributes_map'][name].get(value):
                 value = self.language_spec['attributes_map'][name][value]
+                if self.language_spec['attributes_map'][name].get('_import'):
+                    self.specific_imports.add(self.language_spec['attributes_map'][name]['_import'])
             elif self.language_spec.get('use_boolean') and value in ['true', 'false']:
                 value = value
             elif isinstance(value, str) and self.language_spec.get('string_quote'):
@@ -281,15 +283,6 @@ class TwimlCodeGenerator(object):
 
     def clean_java_specificities(self):
         """Java library specificities which requires to change the TwiML IR."""
-
-        def enumize(verb, attr_name, is_twiml_enum=False):
-            if attr_name in verb.attributes \
-               and not isinstance(verb.attributes[attr_name], bytes):
-                    attr_value = [camelize(attr_name), underscore(verb.attributes[attr_name]).upper()]
-                    if not is_twiml_enum:
-                        attr_value.insert(0, verb.name)
-                    verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
-
         for verb, event in self.twimlir:
             if verb.name == 'Redirect':
                 verb.attributes['url'] = verb.text
@@ -304,17 +297,16 @@ class TwimlCodeGenerator(object):
                 if verb.text:
                     verb.add_child('Number', verb.text)
                     verb.text = None
-                enumize(verb, 'record')
-                enumize(verb, 'trim')
-            elif verb.name == 'Reject':
-                enumize(verb, 'reason')
-            elif verb.name == 'Say':
-                enumize(verb, 'voice')
-                enumize(verb, 'language', is_twiml_enum=True)
-                self.specific_imports.add('import com.twilio.twiml.Language;')
+                self.java_enumize(verb, 'record')
+                self.java_enumize(verb, 'trim')
             elif verb.name == 'Message' and verb.text:
                 verb.add_child('Body', verb.text)
                 verb.text = None
+            elif verb.name == 'Reject':
+                self.java_enumize(verb, 'reason')
+            elif verb.name == 'Say':
+                self.java_enumize(verb, 'voice')
+                self.java_enumize(verb, 'language', is_twiml_enum=True)
             elif verb.name in ['Client', 'Number', 'Sip']:
                 if 'statusCallbackEvent' in verb.attributes:
                     verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
@@ -326,16 +318,26 @@ class TwimlCodeGenerator(object):
                     self.specific_imports.add('import java.util.Arrays;')
                     self.specific_imports.add('import com.twilio.twiml.Event;')
             elif verb.name == 'Conference':
-                enumize(verb, 'beep')
-                enumize(verb, 'record')
+                self.java_enumize(verb, 'beep')
+                self.java_enumize(verb, 'record')
                 if 'statusCallbackEvent' in verb.attributes:
                     verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
                         ', '.join(
-                            ['Conference.ConferenceEvent.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
+                            ['ConferenceEvent.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
                         )
                     ).encode('utf-8')
                     verb.attributes.pop('statusCallbackEvent')
+                    self.specific_imports.add('import static com.twilio.twiml.Conference.ConferenceEvent;')
                     self.specific_imports.add('import java.util.Arrays;')
+
+    def java_enumize(self, verb, attr_name, is_twiml_enum=False):
+            if attr_name in verb.attributes \
+               and not isinstance(verb.attributes[attr_name], bytes):
+                    attr_value = [camelize(attr_name), underscore(verb.attributes[attr_name]).upper()]
+                    if not is_twiml_enum:
+                        attr_value.insert(0, verb.name)
+                    verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
+                    self.specific_imports.add('import com.twilio.twiml.Language;')
 
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""

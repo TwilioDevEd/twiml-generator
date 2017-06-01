@@ -15,7 +15,7 @@
 
   "add_imports": "multiple_lines",
   "reverse_build": true,
-  "necessary_imports": ["TwiMLException", "Method"],
+  "necessary_imports": ["TwiMLException"],
   "import_voice": "import com.twilio.twiml.{imports};",
   "import_messaging": "import com.twilio.twiml.{imports};",
   "new_variable": "{klass} {variable} = new {klass}.Builder({text}){attributes}{appends}.build();",
@@ -26,11 +26,13 @@
   "attributes_map": {
     "method": {
       "GET": "Method.GET",
-      "POST": "Method.POST"
+      "POST": "Method.POST",
+      "_import": "import com.twilio.twiml.Method;"
     },
     "statusCallbackMethod": {
       "GET": "Method.GET",
-      "POST": "Method.POST"
+      "POST": "Method.POST",
+      "_import": "import com.twilio.twiml.Method;"
     }
   },
   "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};",
