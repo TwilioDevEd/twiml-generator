@@ -7,7 +7,7 @@
 
   "text_format": "{text}, ",
   "attribute_format": "'{name}' => {value}",
-  "attributes_wrapper_format": "array({attributes})",
+  "attributes_wrapper_format": "[{attributes}]",
   "use_semicolon": true,
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",
