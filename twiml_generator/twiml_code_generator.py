@@ -222,6 +222,8 @@ class TwimlCodeGenerator(object):
                 return self.language_spec['voice_class']
             else:
                 return self.language_spec['messaging_class']
+        elif 'new_klass' in self.language_spec:
+            return self.language_spec['new_klass'].format(klass=verb_name)
         else:
             return verb_name
 

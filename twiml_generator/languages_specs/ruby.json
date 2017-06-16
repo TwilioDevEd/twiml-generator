@@ -1,0 +1,24 @@
+{
+  "language": "ruby",
+  "extension": ".rb",
+  
+  
+  "voice_class": "Twilio::TwiML::VoiceResponse",
+  "messaging_class": "Twilio::TwiML::MessagingResponse",
+  "text_format": "{text}, ",
+  "attribute_name_style": "underscore",
+  "attribute_format": "{name}: {value}",
+  "chain_calls": false,
+  "code_wrapper": "{imports}\n{code}\n{print}",
+  "code_wrapper_padding": 0,
+
+  "add_imports": "single_line",
+  "import_voice": "require 'twilio-ruby'",
+  "import_messaging": "require 'twilio-ruby'",
+  "new_variable": "{variable} = {klass}.new {text}{attributes}",
+  "new_leaf": "{parent}.{method} {text}{attributes}",
+  "new_klass": "Twilio::TwiML::{klass}",
+  "append": "{parent}.append {variable}",
+  "print": "puts response",
+  "formatter": "ruby-beautify --overwrite {filepath}"
+}
