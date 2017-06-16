@@ -82,6 +82,8 @@ class TwimlCodeGenerator(object):
                 append_line = self.output_append(verb)
                 if append_line != '':
                     lines.append(append_line)
+            if self.language_spec.get('optional_parentheses', False):
+                lines[-1] = lines[-1].replace('()', '')
         return self.output_wrapper(lines)
 
     def __reverse_repr__(self):

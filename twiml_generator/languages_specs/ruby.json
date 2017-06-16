@@ -15,11 +15,12 @@
   "add_imports": "single_line",
   "import_voice": "require 'twilio-ruby'",
   "import_messaging": "require 'twilio-ruby'",
-  "new_variable": "{variable} = {klass}.new {text}{attributes}",
-  "new_leaf": "{parent}.{method} {text}{attributes}",
+  "new_variable": "{variable} = {klass}.new({text}{attributes})",
+  "new_leaf": "{parent}.{method}({text}{attributes})",
   "new_klass": "Twilio::TwiML::{klass}",
-  "append": "{parent}.append {variable}",
+  "append": "{parent}.append({variable})",
   "print": "puts response",
   "use_boolean": true,
+  "optional_parentheses": true,
   "formatter": ""
 }
