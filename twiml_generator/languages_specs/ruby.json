@@ -20,5 +20,6 @@
   "new_klass": "Twilio::TwiML::{klass}",
   "append": "{parent}.append {variable}",
   "print": "puts response",
-  "formatter": "ruby-beautify --overwrite {filepath}"
+  "use_boolean": true,
+  "formatter": ""
 }
