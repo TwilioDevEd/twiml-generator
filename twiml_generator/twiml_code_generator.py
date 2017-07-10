@@ -53,6 +53,8 @@ class TwimlCodeGenerator(object):
             self.clean_python_specificities()
         elif language == 'csharp':
             self.clean_csharp_specificities()
+        elif language == 'ruby':
+            self.clean_ruby_specificities()
 
     def overwrite_language_spec(self, key, value):
         self.language_spec[key] = value
@@ -129,7 +131,8 @@ class TwimlCodeGenerator(object):
                 attributes=self.join_attributes_for_verb(verb),
                 klass=self.class_for_verb(verb),
                 text=self.quote_text_for_verb(verb),
-                appends=self.join_appends(verb)
+                appends=self.join_appends(verb),
+                indent=self.indent_for_verb(verb)
             )
         else:
             return self.language_spec['new_variable'].format(
@@ -137,7 +140,8 @@ class TwimlCodeGenerator(object):
                 klass=self.class_for_verb(verb),
                 attributes=self.join_attributes_for_verb(verb),
                 text=self.quote_text_for_verb(verb),
-                appends=self.join_appends(verb)
+                appends=self.join_appends(verb),
+                indent=self.indent_for_verb(verb)
             )
 
     def output_new_leaf(self, verb):
@@ -149,7 +153,8 @@ class TwimlCodeGenerator(object):
                 text=self.quote_text_for_verb(verb),
                 attributes=self.join_attributes_for_verb(verb),
                 klass=self.class_for_verb(verb),
-                variable=self.variable_for_verb(verb)
+                variable=self.variable_for_verb(verb),
+                indent=self.indent_for_verb(verb)
             )
         else:
             return self.language_spec['new_leaf'].format(
@@ -158,7 +163,8 @@ class TwimlCodeGenerator(object):
                 text=self.quote_text_for_verb(verb),
                 attributes=self.join_attributes_for_verb(verb),
                 klass=self.class_for_verb(verb),
-                variable=self.variable_for_verb(verb)
+                variable=self.variable_for_verb(verb),
+                indent=self.indent_for_verb(verb)
             )
 
     def output_append(self, verb):
@@ -166,7 +172,8 @@ class TwimlCodeGenerator(object):
         return self.language_spec['append'].format(
             parent=self.variable_for_verb(verb.parent),
             klass=self.class_for_verb(verb),
-            variable=self.variable_for_verb(verb)
+            variable=self.variable_for_verb(verb),
+            indent=self.indent_for_verb(verb)
         )
 
     def output_print(self):
@@ -280,6 +287,9 @@ class TwimlCodeGenerator(object):
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
         return built_attributes
 
+    def indent_for_verb(self, verb):
+        return '    ' * (verb.depth + self.language_spec.get('depth_padding', 0))
+
     def join_appends(self, verb):
         """Return a string with all the leaves to be appened to the current verb."""
         if self.language_spec.get('chained_append'):
@@ -369,6 +379,19 @@ class TwimlCodeGenerator(object):
                 verb.attributes['url'] = verb.text
                 verb.text = None
 
+    def clean_ruby_specificities(self):
+        """Ruby library specificities which requires to change the TwiML IR."""
+        for verb, event in self.twimlir:
+            if verb.name == 'Play' and verb.text:
+                verb.attributes['url'] = verb.text
+                verb.text = None
+            elif verb.name == 'Message' and verb.text:
+                verb.attributes['body'] = verb.text
+                verb.text = None
+            elif verb.name == 'Dial' and verb.text:
+                verb.attributes['number'] = verb.text
+                verb.text = None
+
     def write_code(self):
         """Write the code in the generator file."""
         if self.code_filepath.exists():
@@ -427,7 +450,7 @@ class TwimlCodeGenerator(object):
 
         example_filepath = Path('Example.java')
         class_filepath = Path('Example.class')
-        jar_filepath = self.lib_filepath / 'twilio-7.11.0-jar-with-dependencies.jar'
+        jar_filepath = self.lib_filepath / 'twilio-7.12.0-alpha-1-jar-with-dependencies.jar'
 
         def java_cleanup():
             try:
