@@ -16,8 +16,10 @@
   "add_imports": "multiple_lines",
   "reverse_build": true,
   "necessary_imports": ["TwiMLException"],
-  "import_voice": "import com.twilio.twiml.{imports};",
-  "import_messaging": "import com.twilio.twiml.{imports};",
+  "common_classes": ["TwiMLException", "MessagingResponse", "VoiceResponse"],
+  "import_common": "import com.twilio.twiml.{imports};",
+  "import_voice": "import com.twilio.twiml.voice.{imports};",
+  "import_messaging": "import com.twilio.twiml.messaging.{imports};",
   "new_variable": "{klass} {variable} = new {klass}.Builder({text}){attributes}{appends}.build();",
   "new_leaf": "{klass} {variable} = new {klass}.Builder({text}){attributes}.build();",
   "chained_append": ".{method}({variable})",
@@ -25,16 +27,21 @@
   "string_quote": "\"",
   "attributes_map": {
     "method": {
-      "GET": "Method.GET",
-      "POST": "Method.POST",
-      "_import": "import com.twilio.twiml.Method;"
+      "GET": "HttpMethod.GET",
+      "POST": "HttpMethod.POST",
+      "_import": "import com.twilio.http.HttpMethod;"
     },
     "statusCallbackMethod": {
-      "GET": "Method.GET",
-      "POST": "Method.POST",
-      "_import": "import com.twilio.twiml.Method;"
+      "GET": "HttpMethod.GET",
+      "POST": "HttpMethod.POST",
+      "_import": "import com.twilio.http.HttpMethod;"
+    },
+    "input": {
+      "speech": "Gather.Input.SPEECH",
+      "dtmf": "Gather.Input.DTMF",
+      "dtmf_speech": "Gather.Input.DTMF_SPEECH",
+      "speech dtmf": "Gather.Input.DTMF_SPEECH"
     }
   },
-  "new_leaf_no_builder": "{klass} {variable} = new {klass}({text}){attributes};",
   "use_boolean": true
 }

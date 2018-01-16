@@ -114,8 +114,15 @@ class TwimlCodeGenerator(object):
                 imports=', '.join(imports)
             ) + '\n'
         elif self.language_spec.get('add_imports') == 'multiple_lines':
-            imports = [verb if verb != 'Response' else self.class_for_verb_name(verb) for verb in imports]
-            imports = '\n'.join([self.language_spec[import_kind].format(imports=i) for i in imports]) + '\n'
+            classes_to_import = [verb if verb != 'Response' else self.class_for_verb_name(verb) for verb in imports]
+            imports = []
+            for class_name in classes_to_import:
+                if self.language_spec.get('import_common') \
+                   and class_name in self.language_spec.get('common_classes', []):
+                    imports.append(self.language_spec['import_common'].format(imports=class_name))
+                else:
+                    imports.append(self.language_spec[import_kind].format(imports=class_name))
+            imports = '\n'.join(imports) + '\n'
             if len(self.specific_imports) > 0:
                 imports += '\n'.join(self.specific_imports)
             return imports
@@ -146,26 +153,15 @@ class TwimlCodeGenerator(object):
 
     def output_new_leaf(self, verb):
         """Return a string for adding a simple verb to a parent."""
-        if self.language_spec['language'] == 'java' and verb.name in ['Body', 'Media', 'Hangup', 'Leave']:
-            return self.language_spec['new_leaf_no_builder'].format(
-                parent=self.variable_for_verb(verb.parent),
-                method=self.method_for_verb(verb),
-                text=self.quote_text_for_verb(verb),
-                attributes=self.join_attributes_for_verb(verb),
-                klass=self.class_for_verb(verb),
-                variable=self.variable_for_verb(verb),
-                indent=self.indent_for_verb(verb)
-            )
-        else:
-            return self.language_spec['new_leaf'].format(
-                parent=self.variable_for_verb(verb.parent),
-                method=self.method_for_verb(verb),
-                text=self.quote_text_for_verb(verb),
-                attributes=self.join_attributes_for_verb(verb),
-                klass=self.class_for_verb(verb),
-                variable=self.variable_for_verb(verb),
-                indent=self.indent_for_verb(verb)
-            )
+        return self.language_spec['new_leaf'].format(
+            parent=self.variable_for_verb(verb.parent),
+            method=self.method_for_verb(verb),
+            text=self.quote_text_for_verb(verb),
+            attributes=self.join_attributes_for_verb(verb),
+            klass=self.class_for_verb(verb),
+            variable=self.variable_for_verb(verb),
+            indent=self.indent_for_verb(verb)
+        )
 
     def output_append(self, verb):
         """Return a string to append a verb to its parent."""
@@ -304,60 +300,46 @@ class TwimlCodeGenerator(object):
     def clean_java_specificities(self):
         """Java library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
-            if verb.name == 'Redirect':
-                verb.attributes['url'] = verb.text
-                verb.text = None
-            elif verb.name == 'Enqueue':
+            if verb.name == 'Enqueue':
                 verb.attributes['queueName'] = verb.text
                 verb.text = None
             elif verb.name == 'Play':
                 if not verb.text:
                     verb.text = ' '
             elif verb.name == 'Dial':
-                if verb.text:
-                    verb.add_child('Number', verb.text)
-                    verb.text = None
                 self.java_enumize(verb, 'record')
                 self.java_enumize(verb, 'trim')
-            elif verb.name == 'Message' and verb.text:
-                verb.add_child('Body', verb.text)
-                verb.text = None
             elif verb.name == 'Reject':
                 self.java_enumize(verb, 'reason')
             elif verb.name == 'Say':
                 self.java_enumize(verb, 'voice')
-                self.java_enumize(verb, 'language', is_twiml_enum=True)
+                self.java_enumize(verb, 'language')
             elif verb.name in ['Client', 'Number', 'Sip']:
                 if 'statusCallbackEvent' in verb.attributes:
                     verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
                         ', '.join(
-                            ['Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
+                            [verb.name + '.Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
                         )
                     ).encode('utf-8')
                     verb.attributes.pop('statusCallbackEvent')
                     self.specific_imports.add('import java.util.Arrays;')
-                    self.specific_imports.add('import com.twilio.twiml.Event;')
             elif verb.name == 'Conference':
                 self.java_enumize(verb, 'beep')
                 self.java_enumize(verb, 'record')
                 if 'statusCallbackEvent' in verb.attributes:
                     verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
                         ', '.join(
-                            ['ConferenceEvent.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
+                            ['Conference.Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
                         )
                     ).encode('utf-8')
                     verb.attributes.pop('statusCallbackEvent')
-                    self.specific_imports.add('import static com.twilio.twiml.Conference.ConferenceEvent;')
                     self.specific_imports.add('import java.util.Arrays;')
 
-    def java_enumize(self, verb, attr_name, is_twiml_enum=False):
-            if attr_name in verb.attributes \
-               and not isinstance(verb.attributes[attr_name], bytes):
-                    attr_value = [camelize(attr_name), underscore(verb.attributes[attr_name]).upper()]
-                    if not is_twiml_enum:
-                        attr_value.insert(0, verb.name)
-                    verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
-                    self.specific_imports.add('import com.twilio.twiml.Language;')
+    def java_enumize(self, verb, attr_name):
+        if attr_name in verb.attributes \
+           and not isinstance(verb.attributes[attr_name], bytes):
+                attr_value = [verb.name, camelize(attr_name), underscore(verb.attributes[attr_name]).upper()]
+                verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
 
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""
@@ -450,7 +432,7 @@ class TwimlCodeGenerator(object):
 
         example_filepath = Path('Example.java')
         class_filepath = Path('Example.class')
-        jar_filepath = self.lib_filepath / 'twilio-7.12.0-alpha-1-jar-with-dependencies.jar'
+        jar_filepath = self.lib_filepath / 'twilio-7.15.7-SNAPSHOT-jar-with-dependencies.jar'
 
         def java_cleanup():
             try:
