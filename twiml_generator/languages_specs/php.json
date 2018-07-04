@@ -2,8 +2,8 @@
   "language": "php",
   "extension": ".php",
 
-  "voice_class": "Twiml",
-  "messaging_class": "Twiml",
+  "voice_class": "TwiML",
+  "messaging_class": "TwiML",
 
   "text_format": "{text}, ",
   "attribute_format": "'{name}' => {value}",
@@ -14,8 +14,8 @@
   "code_wrapper_padding": 0,
 
   "add_imports": "fixed",
-  "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\Twiml;",
-  "import_messaging": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\Twiml;",
+  "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
+  "import_messaging": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
   "new_variable": "${variable} = new {klass}({attributes});",
   "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
   "new_leaf": "${parent}->{method}({text}{attributes});",
