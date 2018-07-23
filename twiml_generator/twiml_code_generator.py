@@ -262,6 +262,10 @@ class TwimlCodeGenerator(object):
                 return self.language_spec['messaging_class']
         elif 'new_klass' in self.language_spec:
             return self.language_spec['new_klass'].format(klass=verb_name)
+        # Java: variable type, e.g. SsmlBreak
+        elif verb_name in self.SSML_VERBS:
+            verb_name = camelize(verb_name.replace('-', '_').capitalize())
+            return f'Ssml{verb_name}'
         else:
             return verb_name
 
