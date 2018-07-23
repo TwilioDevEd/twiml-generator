@@ -2,388 +2,382 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xs:annotation>
-    	<xs:documentation>
-    		Twilio Realtime Call API XML Schema Copyright 2008, Twilio,
-    		Inc.
-    	</xs:documentation>
+        <xs:documentation>
+            Twilio Realtime Call API XML Schema Copyright 2008, Twilio,
+            Inc.
+        </xs:documentation>
     </xs:annotation>
-    <xs:element name="Response">
-	 <xs:complexType>
-	 	<xs:sequence maxOccurs="unbounded" minOccurs="0">
+    <xs:include schemaLocation="synthesis-nonamespace.xsd"/>
+    <!-- extension-snippet.xsd will be replaced by implementation of SchemaProvider.class-->
+    <xs:include schemaLocation="twilio-extensions.xsd"/>
+    <xs:element name="Response" type="responseType"/>
 
-
-	 		<xs:choice>
-	 			<xs:element name="Play" type="PlayType" />
-	 			<xs:element name="Say" type="SayType"></xs:element>
-	 			<xs:element name="Gather" type="GatherType"></xs:element>
-
-	 			<xs:element name="Dial" type="DialType"></xs:element>
-	 			<xs:element name="Record" type="RecordType"></xs:element>
-	 			<xs:element name="Annotate" type="xs:string"></xs:element>
-	 			<xs:element name="Hangup" type="HangupType"></xs:element>
-	 			<xs:element name="Redirect" type="RedirectType">
-
-	 			</xs:element>
-	 			<xs:element name="Pause" type="PauseType"></xs:element>
-	 			<xs:element name="Sms" type="SmsType"></xs:element>
-	 			<xs:element name="Publish" type="PublishType"></xs:element>
-	 			<xs:element name="Reject" type="RejectType"></xs:element>
-	 			<xs:element name="Enqueue" type="EnqueueType"></xs:element>
-
-	 			<xs:element name="Echo" type="EchoType"></xs:element>
-	 		</xs:choice>
-
-	 	</xs:sequence>
-	 	<xs:attribute name="version" type="xs:string"></xs:attribute>
-	 </xs:complexType>
-    </xs:element>
-
+    <xs:complexType name="responseType">
+        <xs:complexContent>
+            <!--responseTypeBase will come from twilio-extensio-snippet.xsd -->
+            <xs:extension base="responseTypeBase">
+            <xs:sequence maxOccurs="unbounded" minOccurs="0">
+                <xs:choice>
+                    <xs:element name="Play" type="PlayType"/>
+                    <xs:element name="Say" type="SayType"></xs:element>
+                    <xs:element name="Gather" type="GatherType"></xs:element>
+                    <xs:element name="Dial" type="DialType"></xs:element>
+                    <xs:element name="Record" type="RecordType"></xs:element>
+                    <xs:element name="Annotate" type="xs:string"></xs:element>
+                    <xs:element name="Hangup" type="HangupType"></xs:element>
+                    <xs:element name="Redirect" type="RedirectType"></xs:element>
+                    <xs:element name="Pause" type="PauseType"></xs:element>
+                    <xs:element name="Sms" type="SmsType"></xs:element>
+                    <xs:element name="Publish" type="PublishType"></xs:element>
+                    <xs:element name="Reject" type="RejectType"></xs:element>
+                    <xs:element name="Enqueue" type="EnqueueType"></xs:element>
+                    <xs:element name="Echo" type="EchoType"></xs:element>
+                    <xs:element name="Start" type="StartType"></xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="version" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+        </xs:complexType>
 
     <xs:complexType name="PlayType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="loop" type="xs:int"></xs:attribute>
-    			<xs:attribute name="digits" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="loop" type="xs:int"></xs:attribute>
+                <xs:attribute name="digits" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="SayType" mixed="true">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    		<xs:element name="break" type="breakType"></xs:element>
-    	</xs:sequence>
-    	<xs:attribute name="loop" type="xs:int"></xs:attribute>
-    	<xs:attribute name="voice" type="voiceType"></xs:attribute>
-    	<xs:attribute name="language" type="xs:string"></xs:attribute>
-    	<xs:attribute name="rate" type="xs:int"></xs:attribute>
+        <xs:complexContent>
+            <xs:extension base="speak">
+                <xs:attribute name="loop" type="xs:int"></xs:attribute>
+                <xs:attribute name="voice" type="voiceType"></xs:attribute>
+                <xs:attribute name="language" type="xs:string"></xs:attribute>
+                <xs:attribute name="rate" type="rateType"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="GatherType">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    		<xs:choice>
-    			<xs:element name="Play" type="PlayType"></xs:element>
-    			<xs:element name="Say" type="SayType"></xs:element>
-    			<xs:element name="Pause" type="PauseType"></xs:element>
-    		</xs:choice>
-    	</xs:sequence>
-    	<xs:attribute name="numDigits" type="xs:int"></xs:attribute>
-    	<xs:attribute name="finishOnKey" type="xs:string"></xs:attribute>
-    	<xs:attribute name="method" type="methodType"></xs:attribute>
-    	<xs:attribute name="action" type="xs:string"></xs:attribute>
-    	<xs:attribute name="timeout" type="xs:int"></xs:attribute>
-    	<xs:attribute name="grammar" type="xs:string"></xs:attribute>
-    	<xs:attribute name="grammarUrl" type="xs:string"></xs:attribute>
-    	<xs:attribute name="input" type="xs:string"></xs:attribute>
-    	<xs:attribute name="partialResultCallback" type="xs:string"></xs:attribute>
-    	<xs:attribute name="partialResultCallbackMethod" type="xs:string"></xs:attribute>
-    	<xs:attribute name="hints" type="xs:string"></xs:attribute>
-		<xs:attribute name="language" type="xs:string"></xs:attribute>
-		<xs:attribute name="bargeIn" type="xs:string"></xs:attribute>
-		<xs:attribute name="acknowledgeSoundUrl" type="xs:string"></xs:attribute>
-
-	</xs:complexType>
-
-
-
-
-
-
-
-
-
-    <xs:simpleType name="methodType">
-    	<xs:restriction base="xs:string">
-
-
-
-
-    	</xs:restriction>
+    <xs:simpleType name="rateType">
+      <xs:union memberTypes="number nonnegpercent speedscale" />
+    </xs:simpleType>
+  
+    <xs:simpleType name="speedscale">
+      <xs:annotation>
+        <xs:documentation>descriptive values for speed
+        </xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="x-fast" />
+        <xs:enumeration value="fast" />
+        <xs:enumeration value="medium" />
+        <xs:enumeration value="slow" />
+        <xs:enumeration value="x-slow" />
+        <xs:enumeration value="default" />
+      </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="GatherType">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:choice>
+                <xs:element name="Play" type="PlayType"></xs:element>
+                <xs:element name="Say" type="SayType"></xs:element>
+                <xs:element name="Pause" type="PauseType"></xs:element>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="numDigits" type="xs:int"></xs:attribute>
+        <xs:attribute name="finishOnKey" type="xs:string"></xs:attribute>
+        <xs:attribute name="actionOnEmptyResult" type="xs:string"></xs:attribute>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="action" type="xs:string"></xs:attribute>
+        <xs:attribute name="timeout" type="xs:int"></xs:attribute>
+        <xs:attribute name="grammar" type="xs:string"></xs:attribute>
+        <xs:attribute name="grammarUrl" type="xs:string"></xs:attribute>
+        <xs:attribute name="input" type="xs:string"></xs:attribute>
+        <xs:attribute name="speechTimeout" type="xs:string"></xs:attribute>
+        <xs:attribute name="partialResultCallback" type="xs:string"></xs:attribute>
+        <xs:attribute name="partialResultCallbackMethod" type="xs:string"></xs:attribute>
+        <xs:attribute name="hints" type="xs:string"></xs:attribute>
+        <xs:attribute name="language" type="xs:string"></xs:attribute>
+        <xs:attribute name="bargeIn" type="xs:string"></xs:attribute>
+        <xs:attribute name="profanityFilter" type="xs:string"></xs:attribute>
+        <xs:attribute name="maxSpeechTime" type="xs:int"></xs:attribute>
+        <xs:attribute name="speechModel" type="xs:string"></xs:attribute>
+        <xs:attribute name="secure" type="xs:string"></xs:attribute>
+    </xs:complexType>
 
+    <xs:simpleType name="methodType">
+        <xs:restriction base="xs:string"></xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="DialType" mixed="true">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    		<xs:choice>
-    			<xs:element name="Number" type="NumberType"></xs:element>
-    			<xs:element name="Sip" type="SipType"></xs:element>
-    			<xs:element name="Client" type="ClientType"></xs:element>
-    			<xs:element name="Conference" type="conferenceType"></xs:element>
-    			<xs:element name="Queue" type="QueueType"></xs:element>
-    			<xs:element name="Sim" type="SimType"></xs:element>
-    		</xs:choice>
-    	</xs:sequence>
-    	<xs:attribute name="method" type="methodType"></xs:attribute>
-    	<xs:attribute name="action" type="xs:string"></xs:attribute>
-    	<xs:attribute name="timeout" type="xs:int"></xs:attribute>
-    	<xs:attribute name="hangupOnStar" type="xs:string"></xs:attribute>
-	<xs:attribute name="hangupOn" type="xs:string"></xs:attribute>
-    	<xs:attribute name="callerId" type="xs:string"></xs:attribute>
-    	<xs:attribute name="timeLimit" type="xs:int"></xs:attribute>
-    	<xs:attribute name="ifMachine" type="xs:string"></xs:attribute>
-    	<xs:attribute name="record" type="xs:string"></xs:attribute>
-    	<xs:attribute name="transcribe" type="xs:string"></xs:attribute>
-    	<xs:attribute name="transcribeCallback" type="xs:string"></xs:attribute>
-    	<xs:attribute name="newCallSid" type="xs:string"></xs:attribute>
-    	<xs:attribute name="sequential" type="xs:string"></xs:attribute>
-    	<xs:attribute name="answerOnBridge" type="xs:string"></xs:attribute>
-    	<xs:attribute name="trim" type="xs:string"></xs:attribute>
-    	<xs:attribute name="ringTone" type="xs:string"></xs:attribute>
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:choice>
+                <xs:element name="Number" type="NumberType"></xs:element>
+                <xs:element name="Sip" type="SipType"></xs:element>
+                <xs:element name="Client" type="ClientType"></xs:element>
+                <xs:element name="Conference" type="conferenceType"></xs:element>
+                <xs:element name="Queue" type="QueueType"></xs:element>
+                <xs:element name="Sim" type="SimType"></xs:element>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="action" type="xs:string"></xs:attribute>
+        <xs:attribute name="timeout" type="xs:int"></xs:attribute>
+        <xs:attribute name="hangupOnStar" type="xs:string"></xs:attribute>
+        <xs:attribute name="hangupOn" type="xs:string"></xs:attribute>
+        <xs:attribute name="callerId" type="xs:string"></xs:attribute>
+        <xs:attribute name="timeLimit" type="xs:int"></xs:attribute>
+        <xs:attribute name="ifMachine" type="xs:string"></xs:attribute>
+        <xs:attribute name="record" type="xs:string"></xs:attribute>
+        <xs:attribute name="transcribe" type="xs:string"></xs:attribute>
+        <xs:attribute name="transcribeCallback" type="xs:string"></xs:attribute>
+        <xs:attribute name="newCallSid" type="xs:string"></xs:attribute>
+        <xs:attribute name="sequential" type="xs:string"></xs:attribute>
+        <xs:attribute name="answerOnBridge" type="xs:string"></xs:attribute>
+        <xs:attribute name="trim" type="xs:string"></xs:attribute>
+        <xs:attribute name="ringTone" type="xs:string"></xs:attribute>
         <xs:attribute name="recordingChannels" type="xs:string"></xs:attribute>
         <xs:attribute name="recordingStatusCallback" type="xs:string"></xs:attribute>
         <xs:attribute name="recordingStatusCallbackMethod" type="xs:string"></xs:attribute>
+        <xs:attribute name="recordingStatusCallbackEvent" type="xs:string"></xs:attribute>
         <xs:attribute name="sim" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="NumberType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="sendDigits" type="xs:string"></xs:attribute>
-    			<xs:attribute name="action" type="xs:string"></xs:attribute>
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    			<xs:attribute name="url" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="sendDigits" type="xs:string"></xs:attribute>
+                <xs:attribute name="action" type="xs:string"></xs:attribute>
+                <xs:attribute name="method" type="methodType"></xs:attribute>
+                <xs:attribute name="url" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType name="ClientType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="sendDigits" type="xs:string"></xs:attribute>
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    			<xs:attribute name="url" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+    <xs:complexType name="ClientType" mixed="true">
+        <xs:sequence minOccurs="0">
+            <xs:element name="Identity" minOccurs="0" maxOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="Parameter" type="ClientParamType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="url" type="xs:string"></xs:attribute>
+        <xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
+        <xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
+        <xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="ClientParamType">
+        <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+        <xs:attribute name="value" type="xs:string" use="required"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="QueueType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="url" type="xs:string"></xs:attribute>
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    			<xs:attribute name="callSid" type="xs:string"></xs:attribute>
-    			<xs:attribute name="reservationSid" type="xs:string"></xs:attribute>
-    			<xs:attribute name="postWorkActivitySid" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="url" type="xs:string"></xs:attribute>
+                <xs:attribute name="method" type="methodType"></xs:attribute>
+                <xs:attribute name="callSid" type="xs:string"></xs:attribute>
+                <xs:attribute name="reservationSid" type="xs:string"></xs:attribute>
+                <xs:attribute name="postWorkActivitySid" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="SimType">
-      <xs:simpleContent>
-        <xs:extension base="xs:string">
-        </xs:extension>
-      </xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="RecordType">
-    	<xs:attribute name="method" type="methodType"></xs:attribute>
-    	<xs:attribute name="action" type="xs:string"></xs:attribute>
-    	<xs:attribute name="timeout" type="xs:int"></xs:attribute>
-    	<xs:attribute name="maxLength" type="xs:int"></xs:attribute>
-    	<xs:attribute name="finishOnKey" type="xs:string"></xs:attribute>
-    	<xs:attribute name="transcribe" type="xs:string"></xs:attribute>
-    	<xs:attribute name="transcribeCallback" type="xs:string"></xs:attribute>
-    	<xs:attribute name="playBeep" type="xs:string"></xs:attribute>
-    	<xs:attribute name="trim" type="xs:string"></xs:attribute>
-    	<xs:attribute name="recordingStatusCallback" type="xs:string"></xs:attribute>
-    	<xs:attribute name="recordingStatusCallbackMethod" type="xs:string"></xs:attribute>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="action" type="xs:string"></xs:attribute>
+        <xs:attribute name="timeout" type="xs:int"></xs:attribute>
+        <xs:attribute name="maxLength" type="xs:int"></xs:attribute>
+        <xs:attribute name="finishOnKey" type="xs:string"></xs:attribute>
+        <xs:attribute name="transcribe" type="xs:string"></xs:attribute>
+        <xs:attribute name="transcribeCallback" type="xs:string"></xs:attribute>
+        <xs:attribute name="playBeep" type="xs:string"></xs:attribute>
+        <xs:attribute name="trim" type="xs:string"></xs:attribute>
+        <xs:attribute name="recordingStatusCallback" type="xs:string"></xs:attribute>
+        <xs:attribute name="recordingStatusCallbackMethod" type="xs:string"></xs:attribute>
+        <xs:attribute name="recordingStatusCallbackEvent" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="EnqueueType" mixed="true">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
             <xs:choice>
                 <xs:element name="TaskAttributes" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
                 <xs:element name="Task" type="TaskType"></xs:element>
             </xs:choice>
-    	</xs:sequence>
-    	<xs:attribute name="method" type="methodType"></xs:attribute>
-    	<xs:attribute name="action" type="xs:string"></xs:attribute>
-    	<xs:attribute name="waitUrl" type="xs:string"></xs:attribute>
-    	<xs:attribute name="waitUrlMethod" type="methodType"></xs:attribute>
-    	<xs:attribute name="workflowSid" type="xs:string"></xs:attribute>
+        </xs:sequence>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="action" type="xs:string"></xs:attribute>
+        <xs:attribute name="waitUrl" type="xs:string"></xs:attribute>
+        <xs:attribute name="waitUrlMethod" type="methodType"></xs:attribute>
+        <xs:attribute name="workflowSid" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="TaskType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="priority" type="xs:int"></xs:attribute>
-    			<xs:attribute name="timeout" type="xs:int"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="priority" type="xs:int"></xs:attribute>
+                <xs:attribute name="timeout" type="xs:int"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:simpleType name="voiceType">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="man"></xs:enumeration>
-    		<xs:enumeration value="woman"></xs:enumeration>
-    		<xs:enumeration value="male"></xs:enumeration>
-    		<xs:enumeration value="female"></xs:enumeration>
-    		<xs:enumeration value="alice"></xs:enumeration>
-    	</xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="man|woman|male|female|alice|eve|brian|Polly\.[a-zA-Z]+" />
+        </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="reasonType">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="busy"></xs:enumeration>
-    		<xs:enumeration value="rejected"></xs:enumeration>
-    	</xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="busy"></xs:enumeration>
+            <xs:enumeration value="rejected"></xs:enumeration>
+        </xs:restriction>
     </xs:simpleType>
-
 
     <xs:complexType name="HangupType">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    		<xs:choice>
-    			<xs:element name="Group" type="GroupType"></xs:element>
-    		</xs:choice>
-    	</xs:sequence>
-
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:choice>
+                <xs:element name="Group" type="GroupType"></xs:element>
+            </xs:choice>
+        </xs:sequence>
     </xs:complexType>
-
 
     <xs:complexType name="breakType">
-    	<xs:attribute name="strength" type="xs:string"></xs:attribute>
+        <xs:attribute name="strength" type="xs:string"></xs:attribute>
     </xs:complexType>
-
 
     <xs:complexType name="PauseType">
-    	<xs:attribute name="length" type="xs:int"></xs:attribute>
-    	<xs:attribute name="timeout" type="xs:int"></xs:attribute>
-    	<xs:attribute name="until" type="xs:string"></xs:attribute>
+        <xs:attribute name="length" type="xs:int"></xs:attribute>
+        <xs:attribute name="timeout" type="xs:int"></xs:attribute>
+        <xs:attribute name="until" type="xs:string"></xs:attribute>
     </xs:complexType>
-
-
-    <xs:simpleType name="langType">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="en"></xs:enumeration>
-    		<xs:enumeration value="es"></xs:enumeration>
-    		<xs:enumeration value="fr"></xs:enumeration>
-    		<xs:enumeration value="de"></xs:enumeration>
-    	</xs:restriction>
-    </xs:simpleType>
 
     <xs:complexType name="RedirectType">
 
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="method" type="methodType"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:attribute name="NewAttribute" type="xs:string"></xs:attribute>
-
-
     <xs:attribute name="method" type="methodType"></xs:attribute>
 
-
     <xs:complexType name="SipType" mixed="true">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="1">
-
-
-    		<xs:sequence minOccurs="0" maxOccurs="5">
-    			<xs:element name="Uri" type="UriType"></xs:element>
-    		</xs:sequence>
-    		<xs:sequence maxOccurs="1" minOccurs="0">
-    			<xs:element name="Headers" type="HeadersType"></xs:element>
-    		</xs:sequence>
-    	</xs:sequence>
-
-    	<xs:attribute name="method" type="methodType"></xs:attribute>
-    	<xs:attribute name="url" type="xs:string"></xs:attribute>
-    	<xs:attribute name="sendDigits" type="xs:string"></xs:attribute>
+        <xs:sequence maxOccurs="unbounded" minOccurs="1">
+            <xs:sequence minOccurs="0" maxOccurs="5">
+                <xs:element name="Uri" type="UriType"></xs:element>
+            </xs:sequence>
+            <xs:sequence maxOccurs="1" minOccurs="0">
+                <xs:element name="Headers" type="HeadersType"></xs:element>
+            </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="method" type="methodType"></xs:attribute>
+        <xs:attribute name="url" type="xs:string"></xs:attribute>
+        <xs:attribute name="sendDigits" type="xs:string"></xs:attribute>
         <xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
         <xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
         <xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
-
-
-    	<xs:attribute name="username" type="xs:string"></xs:attribute>
-    	<xs:attribute name="password" type="xs:string"></xs:attribute>
+        <xs:attribute name="username" type="xs:string"></xs:attribute>
+        <xs:attribute name="password" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="conferenceType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="endConferenceOnExit"
-    				type="xs:string">
-    			</xs:attribute>
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    			<xs:attribute name="url" type="xs:string"></xs:attribute>
-    			<xs:attribute name="muted" type="xs:string"></xs:attribute>
-    			<xs:attribute name="startConferenceOnEnter"
-    				type="xs:string">
-    			</xs:attribute>
-    			<xs:attribute name="waitUrl" type="xs:string"></xs:attribute>
-    			<xs:attribute name="waitMethod" type="xs:string"></xs:attribute>
-    			<xs:attribute name="beep" type="xs:string"></xs:attribute>
-    			<xs:attribute name="maxParticipants" type="xs:string"></xs:attribute>
-    			<xs:attribute name="eventCallback" type="xs:string"></xs:attribute>
-    			<xs:attribute name="eventCallbackUrl" type="xs:string"></xs:attribute>
-    			<xs:attribute name="eventCallbackMethod" type="methodType"></xs:attribute>
-    			<xs:attribute name="record" type="xs:string"></xs:attribute>
-    			<xs:attribute name="trim" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
-    			<xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
-    			<xs:attribute name="recordingStatusCallback" type="xs:string"></xs:attribute>
-    			<xs:attribute name="recordingStatusCallbackMethod" type="xs:string"></xs:attribute>
-			<xs:attribute name="whisper" type="xs:string"></xs:attribute>
-			<xs:attribute name="whisperChannel" type="xs:string"></xs:attribute>
-			<xs:attribute name="WhisperChannel" type="xs:string"></xs:attribute>
-			<xs:attribute name="region" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="endConferenceOnExit" type="xs:string"></xs:attribute>
+                <xs:attribute name="method" type="methodType"></xs:attribute>
+                <xs:attribute name="url" type="xs:string"></xs:attribute>
+                <xs:attribute name="muted" type="xs:string"></xs:attribute>
+                <xs:attribute name="startConferenceOnEnter" type="xs:string"></xs:attribute>
+                <xs:attribute name="waitUrl" type="xs:string"></xs:attribute>
+                <xs:attribute name="waitMethod" type="xs:string"></xs:attribute>
+                <xs:attribute name="beep" type="xs:string"></xs:attribute>
+                <xs:attribute name="maxParticipants" type="xs:string"></xs:attribute>
+                <xs:attribute name="eventCallback" type="xs:string"></xs:attribute>
+                <xs:attribute name="eventCallbackUrl" type="xs:string"></xs:attribute>
+                <xs:attribute name="eventCallbackMethod" type="methodType"></xs:attribute>
+                <xs:attribute name="record" type="xs:string"></xs:attribute>
+                <xs:attribute name="trim" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallbackMethod" type="xs:string"></xs:attribute>
+                <xs:attribute name="statusCallbackEvent" type="xs:string"></xs:attribute>
+                <xs:attribute name="recordingStatusCallbackEvent" type="xs:string"></xs:attribute>
+                <xs:attribute name="recordingStatusCallback" type="xs:string"></xs:attribute>
+                <xs:attribute name="recordingStatusCallbackMethod" type="xs:string"></xs:attribute>
+                <xs:attribute name="coach" type="xs:string"></xs:attribute>
+                <xs:attribute name="whisper" type="xs:string"></xs:attribute>
+                <xs:attribute name="coachChannel" type="xs:string"></xs:attribute>
+                <xs:attribute name="whisperChannel" type="xs:string"></xs:attribute>
+                <xs:attribute name="WhisperChannel" type="xs:string"></xs:attribute>
+                <xs:attribute name="region" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="SmsType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="from" type="xs:string"></xs:attribute>
-    			<xs:attribute name="to" type="xs:string"></xs:attribute>
-    			<xs:attribute name="action" type="xs:string"></xs:attribute>
-    			<xs:attribute name="method" type="methodType"></xs:attribute>
-    			<xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="from" type="xs:string"></xs:attribute>
+                <xs:attribute name="to" type="xs:string"></xs:attribute>
+                <xs:attribute name="action" type="xs:string"></xs:attribute>
+                <xs:attribute name="method" type="methodType"></xs:attribute>
+                <xs:attribute name="statusCallback" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="PublishType" mixed="true">
         <xs:sequence maxOccurs="unbounded" minOccurs="0">
-        	<xs:any processContents="skip"></xs:any>
+            <xs:any processContents="skip"></xs:any>
         </xs:sequence>
         <xs:anyAttribute processContents="skip"></xs:anyAttribute>
     </xs:complexType>
 
     <xs:complexType name="FieldType">
-    	<xs:attribute name="name" type="xs:string"></xs:attribute>
-    	<xs:attribute name="value" type="xs:string"></xs:attribute>
+        <xs:attribute name="name" type="xs:string"></xs:attribute>
+        <xs:attribute name="value" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="DataType">
-    	<xs:attribute name="name" type="xs:string"></xs:attribute>
-    	<xs:attribute name="value" type="xs:string"></xs:attribute>
+        <xs:attribute name="name" type="xs:string"></xs:attribute>
+        <xs:attribute name="value" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="GroupType">
-    	<xs:attribute name="excludeMe" type="xs:string"></xs:attribute>
-    	<xs:attribute name="status" type="xs:string"></xs:attribute>
+        <xs:attribute name="excludeMe" type="xs:string"></xs:attribute>
+        <xs:attribute name="status" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="RejectType">
-    	<xs:attribute name="reason" type="reasonType"></xs:attribute>
+        <xs:attribute name="reason" type="reasonType"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="HeadersType">
-    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    		<xs:element name="Header" type="HeaderType"></xs:element>
-    	</xs:sequence>
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:element name="Header" type="HeaderType"></xs:element>
+        </xs:sequence>
     </xs:complexType>
-
 
     <xs:complexType name="HeaderType">
         <xs:attribute name="name" type="xs:string"></xs:attribute>
@@ -391,16 +385,21 @@
     </xs:complexType>
 
     <xs:complexType name="UriType">
-    	<xs:simpleContent>
-    		<xs:extension base="xs:string">
-    			<xs:attribute name="priority" type="xs:int"></xs:attribute>
-    			<xs:attribute name="weight" type="xs:int"></xs:attribute>
-    			<xs:attribute name="username" type="xs:string"></xs:attribute>
-    			<xs:attribute name="password" type="xs:string"></xs:attribute>
-    		</xs:extension>
-    	</xs:simpleContent>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="priority" type="xs:int"></xs:attribute>
+                <xs:attribute name="weight" type="xs:int"></xs:attribute>
+                <xs:attribute name="username" type="xs:string"></xs:attribute>
+                <xs:attribute name="password" type="xs:string"></xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
-
     <xs:complexType name="EchoType"></xs:complexType>
+
+    <xs:complexType name="StartType">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:any processContents="skip"></xs:any>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:complexType name="responseTypeBase">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:choice>
+                <!-- File twilio-extensions.xsd is a placeholder and it's content will be replaced by SchemaProvider.class -->
+                <!-- This file is present to keep non java legitimate consumers operating -->
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+
