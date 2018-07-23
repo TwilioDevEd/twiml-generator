@@ -7,7 +7,7 @@ import subprocess
 
 from pathlib import Path
 from lxml import etree
-from inflection import underscore, camelize
+from inflection import underscore, camelize, dasherize
 
 from .twimlir import TwimlIR
 from .twimlir import TwimlIRVerb
