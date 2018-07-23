@@ -418,10 +418,13 @@ class TwimlCodeGenerator(object):
                     verb.attributes['level'] = f"Level.{level.upper().replace('-', '_')}"
 
     def java_enumize(self, verb, attr_name):
-        if attr_name in verb.attributes \
-           and not isinstance(verb.attributes[attr_name], bytes):
-                attr_value = [verb.name, camelize(attr_name), underscore(verb.attributes[attr_name]).upper()]
-                verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
+        if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
+            attr_value = [
+                verb.name,
+                camelize(attr_name),
+                underscore(verb.attributes[attr_name]).upper().replace('.', '_')
+            ]
+            verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
 
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""
