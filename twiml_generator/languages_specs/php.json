@@ -14,11 +14,12 @@
   "code_wrapper_padding": 0,
 
   "add_imports": "fixed",
-  "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
-  "import_messaging": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
+  "import_voice": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML;",
+  "import_messaging": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML;",
   "new_variable": "${variable} = new {klass}({attributes});",
   "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
   "new_leaf": "${parent}->{method}({text}{attributes});",
+  "new_text": "",
   "append": "",
   "print": "echo $response;"
 }
