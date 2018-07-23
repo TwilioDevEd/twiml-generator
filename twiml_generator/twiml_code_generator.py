@@ -350,6 +350,10 @@ class TwimlCodeGenerator(object):
     def clean_java_specificities(self):
         """Java library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
+            # Add imports for SSML
+            if verb.name in self.SSML_VERBS:
+                import_name = f"import com.twilio.twiml.voice.Ssml{camelize(verb.name.capitalize().replace('-', '_'))};"
+                self.specific_imports.add(import_name)
             if verb.name == 'Enqueue':
                 verb.attributes['queueName'] = verb.text
                 verb.text = None
@@ -384,6 +388,34 @@ class TwimlCodeGenerator(object):
                     ).encode('utf-8')
                     verb.attributes.pop('statusCallbackEvent')
                     self.specific_imports.add('import java.util.Arrays;')
+            # Clean variables, attributes and imports for SSML methods
+            elif verb.name == 'break':
+                verb.variable_name = '_break'
+                strength = verb.attributes.get('strength')
+                if strength:
+                    verb.attributes['strength'] = f"Strength.{strength.upper().replace('-', '_')}"
+                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlBreak.Strength;')
+            elif verb.name == 'phoneme':
+                alphabet = verb.attributes.get('alphabet')
+                if alphabet:
+                    verb.attributes['alphabet'] = f"Alphabet.{alphabet.upper().replace('-', '_')}"
+                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlPhoneme.Alphabet;')
+            elif verb.name == 'say-as':
+                verb.variable_name = 'sayAs'
+                interpret_as = verb.attributes.get('interpret-as')
+                role = verb.attributes.get('role')
+                if interpret_as:
+                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlSayAs.InterpretAs;')
+                    verb.attributes['interpretAs'] = f"InterpretAs.{interpret_as.upper().replace('-', '_')}"
+                    verb.attributes.pop('interpret-as')
+                if role:
+                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlSayAs.Role;')
+                    verb.attributes['role'] = f"Role.{role.upper().replace('-', '_')}"
+            elif verb.name == 'emphasis':
+                level = verb.attributes.get('level')
+                if level:
+                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlEmphasis.Level;')
+                    verb.attributes['level'] = f"Level.{level.upper().replace('-', '_')}"
 
     def java_enumize(self, verb, attr_name):
         if attr_name in verb.attributes \
