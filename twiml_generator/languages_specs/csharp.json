@@ -22,6 +22,7 @@
   "import_messaging": "using Twilio.TwiML;",
   "new_variable": "var {variable} = new {klass}({text}{attributes});",
   "new_leaf": "{parent}.{method}({text}{attributes});",
+  "new_text": "{parent}.AddText(\"{text}\");",
   "chained_append": ".{method}({variable})",
   "print": "System.Console.WriteLine(response.ToString());",
   "string_quote": "\"",
