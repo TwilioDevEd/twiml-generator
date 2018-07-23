@@ -445,6 +445,11 @@ class TwimlCodeGenerator(object):
             elif verb.name == 'Redirect' and self.twimlir.is_messaging_response:
                 verb.attributes['url'] = verb.text
                 verb.text = None
+            elif verb.name == 'say-as':
+                interpret_as = verb.attributes.get('interpret-as')
+                if interpret_as:
+                    verb.attributes['interpretAs'] = interpret_as
+                    verb.attributes.pop('interpret-as')
 
     def clean_ruby_specificities(self):
         """Ruby library specificities which requires to change the TwiML IR."""
