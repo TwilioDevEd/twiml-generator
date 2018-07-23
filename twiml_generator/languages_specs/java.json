@@ -22,6 +22,7 @@
   "import_messaging": "import com.twilio.twiml.messaging.{imports};",
   "new_variable": "{klass} {variable} = new {klass}.Builder({text}){attributes}{appends}.build();",
   "new_leaf": "{klass} {variable} = new {klass}.Builder({text}){attributes}.build();",
+  "new_text": "{parent}.addText(\"{text}\")",
   "chained_append": ".{method}({variable})",
   "print": "try {\n    System.out.println(response.toXml());\n} catch (TwiMLException e) {\n    e.printStackTrace();\n}",
   "string_quote": "\"",
