@@ -110,7 +110,10 @@ class TwimlCodeGenerator(object):
         else:
             import_kind = 'import_messaging'
 
+        # Remove import statements for SSML_VERBS, since they are generally methods in the Say class
         imports = self.twimlir.verb_names
+        imports = list(set(imports) - set(self.SSML_VERBS))
+
         if self.language_spec.get('necessary_imports'):
             imports.extend(self.language_spec['necessary_imports'])
 
