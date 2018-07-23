@@ -79,7 +79,8 @@ class TwimlIR(object):
                     name=twiml_verb.tag,
                     attributes=self.clean_attributes(twiml_verb.tag, twiml_verb.attrib),
                     text=self.__class__.clean_text(twiml_verb.text),
-                    parent=latest_verb
+                    parent=latest_verb,
+                    tail=twiml_verb.tail,
                 )
                 if twiml_verb.tag == 'Message':
                     self.is_voice_response = False
@@ -160,11 +161,12 @@ class TwimlIR(object):
 class TwimlIRVerb(object):
     """Internal Representation of a TwiML verb."""
 
-    def __init__(self, name, attributes, text, parent):
+    def __init__(self, name, attributes, text, parent, tail):
         self.name = name
         self.attributes = dict(attributes)
         self.text = text
         self.parent = parent
+        self.tail = tail
 
         self.children = []
 
