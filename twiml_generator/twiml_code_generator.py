@@ -317,6 +317,10 @@ class TwimlCodeGenerator(object):
                 value = value.decode('utf-8')
             else:
                 value = repr(value)
+            # Some Java SSML attributes are classes, this strips the " from the string
+            # making it a real class. E.g.: "Strenght.X-WEAK" to Strength.X-WEAK
+            if name in self.JAVA_SSML_CLASS_ATTRIBUTES and self.language_spec.get('language') == 'java':
+                value = value.strip('"')
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
         return built_attributes
 
