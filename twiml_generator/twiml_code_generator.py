@@ -86,6 +86,10 @@ class TwimlCodeGenerator(object):
                 append_line = self.output_append(verb)
                 if append_line != '':
                     lines.append(append_line)
+            # Method for adding text after a closing tag
+            # for example, append() in Python or addText() in node
+            if verb.tail and not verb.tail.startswith('\n'):
+                lines.append(self.output_new_text(verb))
             if self.language_spec.get('optional_parentheses', False):
                 lines[-1] = lines[-1].replace('()', '')
         return self.output_wrapper(lines)
@@ -163,6 +167,13 @@ class TwimlCodeGenerator(object):
             klass=self.class_for_verb(verb),
             variable=self.variable_for_verb(verb),
             indent=self.indent_for_verb(verb)
+        )
+
+    def output_new_text(self, verb):
+        """"""
+        return self.language_spec['new_text'].format(
+            parent=self.variable_for_verb(verb.parent),
+            text=verb.tail.rstrip(),
         )
 
     def output_append(self, verb):
@@ -291,11 +302,20 @@ class TwimlCodeGenerator(object):
     def join_appends(self, verb):
         """Return a string with all the leaves to be appened to the current verb."""
         if self.language_spec.get('chained_append'):
-            return ''.join(
-                [self.language_spec['chained_append'].format(
+            chain = []
+            for v in verb.children:
+                chain.append(self.language_spec['chained_append'].format(
                     method=self.method_for_verb(v),
-                    variable=self.variable_for_verb(v))
-                    for v in verb.children])
+                    variable=self.variable_for_verb(v)
+                ))
+                # Chained addText() method
+                if v.tail and not v.tail.startswith('\n'):
+                    if self.language_spec['language'] == 'java':
+                        # In Java every method is chained, so we need to drop the parent
+                        # E.g. ssmlP(p).addText("aaaaaa").ssmlPhoneme(phoneme).addText("bbbbbbb")
+                        v.parent = ''
+                    chain.append(self.output_new_text(v))
+            return ''.join(chain)
         else:
             return ''
 
