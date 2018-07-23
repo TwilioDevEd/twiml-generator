@@ -228,9 +228,26 @@ class TwimlCodeGenerator(object):
     def method_for_verb(self, verb):
         """Return a formated method name for a given verb."""
         if self.language_spec.get('method_name_style') == 'camelize':
-            return camelize(verb.name)
+            method_name = camelize(verb.name)
         else:
-            return verb.name.lower()
+            method_name = verb.name.lower()
+
+        language = self.language_spec.get('language')
+        if verb.name in self.SSML_VERBS:
+            if language == 'python':
+                method_name = method_name.replace('-', '_')
+                method_name = f'ssml_{method_name}'
+            if language == 'php':
+                method_name = method_name.replace('-', '_')
+                method_name = f'{camelize(method_name)}'
+            if language in ['node', 'java']:
+                method_name = method_name.replace('-', '_')
+                method_name = f'ssml{camelize(method_name)}'
+            if language == 'csharp':
+                method_name = method_name.replace('-', '_')
+                method_name = f'Ssml{camelize(method_name)}'
+
+        return method_name
 
     def class_for_verb(self, verb):
         """Return a formated class name for a given verb."""
