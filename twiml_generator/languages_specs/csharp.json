@@ -13,9 +13,11 @@
 
 
   "declare_class": true,
-  "method_name_style": "camelize",
+  "method_name_style": "pascalize",
+  "attribute_name_style": "camelize",
   "code_wrapper_padding": 8,
   "code_wrapper": "{imports}\n\nclass Example\n{{\n    static void Main()\n    {{\n{code}\n{print}    }}\n}}\n",
+  "ssml_method_have_prefix": true,
 
   "add_imports": "fixed",
   "import_voice": "using Twilio.TwiML;",

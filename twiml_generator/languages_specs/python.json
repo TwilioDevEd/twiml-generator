@@ -11,6 +11,7 @@
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",
   "code_wrapper_padding": 0,
+  "ssml_method_have_prefix": true,
 
   "add_imports": "single_line",
   "import_voice": "from twilio.twiml.voice_response import {imports}",

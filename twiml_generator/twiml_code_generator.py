@@ -7,15 +7,19 @@ import subprocess
 
 from pathlib import Path
 from lxml import etree
-from inflection import underscore, camelize, dasherize
+from inflection import underscore
+from inflection import camelize as pascalize
 
 from .twimlir import TwimlIR
-from .twimlir import TwimlIRVerb
 
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+def camelize(string):
+    return pascalize(string, uppercase_first_letter=False)
 
 
 def load_language_spec(language):
@@ -29,7 +33,6 @@ def load_language_spec(language):
 
 class TwimlCodeGenerator(object):
     """Class to generate the necessary code for outputing a given TwiML."""
-    SSML_VERBS = ['break', 'emphasis', 'p', 'phoneme', 'prosody', 's', 'say-as', 'sub', 'w']
     JAVA_SSML_CLASS_ATTRIBUTES = ['strength', 'alphabet', 'interpretAs', 'role', 'level']
 
     def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python'):
@@ -111,8 +114,7 @@ class TwimlCodeGenerator(object):
             import_kind = 'import_messaging'
 
         # Remove import statements for SSML_VERBS, since they are generally methods in the Say class
-        imports = self.twimlir.verb_names
-        imports = list(set(imports) - set(self.SSML_VERBS))
+        imports = self.twimlir.get_verb_names(exclude_ssml_verbs=True)
 
         if self.language_spec.get('necessary_imports'):
             imports.extend(self.language_spec['necessary_imports'])
@@ -197,7 +199,7 @@ class TwimlCodeGenerator(object):
         if self.language_spec.get('code_wrapper'):
             return self.language_spec['code_wrapper'].format(
                 imports=self.output_imports(),
-                classname=camelize(underscore(str(self.twiml_filepath.name)[:-4])),
+                classname=pascalize(underscore(str(self.twiml_filepath.name)[:-4])),
                 code=self.output_padded_code(lines),
                 print=self.output_padded_code(self.output_print().split('\n'))
             )
@@ -215,6 +217,8 @@ class TwimlCodeGenerator(object):
         elif not verb.variable_name:
             if self.language_spec.get('variable_name_style') == 'camelize':
                 variable_name = camelize(verb.name)
+            elif self.language_spec.get('variable_name_style') == 'pascalize':
+                variable_name = pascalize(verb.name)
             else:
                 variable_name = verb.name.lower()
             number = 1
@@ -227,25 +231,16 @@ class TwimlCodeGenerator(object):
 
     def method_for_verb(self, verb):
         """Return a formated method name for a given verb."""
-        if self.language_spec.get('method_name_style') == 'camelize':
-            method_name = camelize(verb.name)
-        else:
-            method_name = verb.name.lower()
+        name = verb.name
+        if verb.is_ssml and self.language_spec.get('ssml_method_have_prefix'):
+            name = f'ssml_{verb.name}'
 
-        language = self.language_spec.get('language')
-        if verb.name in self.SSML_VERBS:
-            if language == 'python':
-                method_name = method_name.replace('-', '_')
-                method_name = f'ssml_{method_name}'
-            if language == 'php':
-                method_name = method_name.replace('-', '_')
-                method_name = f'{camelize(method_name)}'
-            if language in ['node', 'java']:
-                method_name = method_name.replace('-', '_')
-                method_name = f'ssml{camelize(method_name)}'
-            if language == 'csharp':
-                method_name = method_name.replace('-', '_')
-                method_name = f'Ssml{camelize(method_name)}'
+        if self.language_spec.get('method_name_style') == 'camelize':
+            method_name = camelize(name)
+        elif self.language_spec.get('method_name_style') == 'pascalize':
+            method_name = pascalize(name)
+        else:
+            method_name = name.lower()
 
         return method_name
 
@@ -262,10 +257,10 @@ class TwimlCodeGenerator(object):
                 return self.language_spec['messaging_class']
         elif 'new_klass' in self.language_spec:
             return self.language_spec['new_klass'].format(klass=verb_name)
-        # Java: variable type, e.g. SsmlBreak
-        elif verb_name in self.SSML_VERBS:
-            verb_name = camelize(verb_name.replace('-', '_').capitalize())
-            return f'Ssml{verb_name}'
+        # # Java: variable type, e.g. SsmlBreak
+        # elif verb_name in self.SSML_VERBS:
+        #     verb_name = camelize(verb_name.replace('-', '_').capitalize())
+        #     return f'Ssml{verb_name}'
         else:
             return verb_name
 
@@ -302,6 +297,8 @@ class TwimlCodeGenerator(object):
         for name, value in verb.attributes.items():
             if self.language_spec.get('attribute_name_style') == 'underscore':
                 name = underscore(name)
+            elif self.language_spec.get('attribute_name_style') == 'camelize':
+                name = camelize(underscore(name))
             if self.language_spec.get('attributes_map') \
                and self.language_spec['attributes_map'].get(name) \
                and self.language_spec['attributes_map'][name].get(value):
@@ -351,8 +348,8 @@ class TwimlCodeGenerator(object):
         """Java library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
             # Add imports for SSML
-            if verb.name in self.SSML_VERBS:
-                import_name = f"import com.twilio.twiml.voice.Ssml{camelize(verb.name.capitalize().replace('-', '_'))};"
+            if verb.is_ssml:
+                import_name = f"import com.twilio.twiml.voice.Ssml{pascalize(verb.name.capitalize().replace('-', '_'))};"
                 self.specific_imports.add(import_name)
             if verb.name == 'Enqueue':
                 verb.attributes['queueName'] = verb.text
@@ -421,7 +418,7 @@ class TwimlCodeGenerator(object):
         if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
             attr_value = [
                 verb.name,
-                camelize(attr_name),
+                pascalize(attr_name),
                 underscore(verb.attributes[attr_name]).upper().replace('.', '_')
             ]
             verb.attributes[attr_name] = '.'.join(attr_value).encode('utf-8')
@@ -435,7 +432,7 @@ class TwimlCodeGenerator(object):
                 verb.text = ' '
             for name, value in verb.attributes.items():
                 if value in ['true', 'false']:
-                    verb.attributes[name] = camelize(value).encode('utf-8')
+                    verb.attributes[name] = pascalize(value).encode('utf-8')
 
     def clean_csharp_specificities(self):
         """C# library specificities which requires to change the TwiML IR."""

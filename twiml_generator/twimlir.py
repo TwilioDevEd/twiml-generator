@@ -72,6 +72,7 @@ class TwimlIR(object):
     def parse_xml(self):
         """Parse the TwiML file and create the internal representation."""
         latest_verb = None
+        processing_ssml = False
         for event, twiml_verb in etree.iterparse(str(self.xml_filepath), events=("start", "end")):
             if event == 'start':
                 logger.debug('Start event on verb : {}'.format(twiml_verb.tag))
@@ -81,7 +82,10 @@ class TwimlIR(object):
                     text=self.__class__.clean_text(twiml_verb.text),
                     parent=latest_verb,
                     tail=twiml_verb.tail,
+                    is_ssml=processing_ssml
                 )
+                if twiml_verb.tag == 'Say' and len(list(twiml_verb)) > 0:
+                    processing_ssml = True
                 if twiml_verb.tag == 'Message':
                     self.is_voice_response = False
                 if twiml_verb.tag == 'Response':
@@ -96,6 +100,8 @@ class TwimlIR(object):
                 latest_verb = latest_verb.parent
                 if latest_verb:
                     logger.debug('Set Latest Verb Seen as : {}'.format(latest_verb.name))
+                if twiml_verb.tag == 'Say' and len(list(twiml_verb)) > 0:
+                    processing_ssml = False
 
     @staticmethod
     def clean_text(text):
@@ -125,7 +131,13 @@ class TwimlIR(object):
             visited.add(verb)
             if event == 'start':
                 queue.append((verb, 'end',))
-                queue.extend([(v, 'start') if not v.is_leaf else (v, 'leaf') for v in reversed(verb.children)])
+                queue.extend(
+                    [
+                        (v, 'start')
+                        if not v.is_leaf else (v, 'leaf')
+                        for v in reversed(verb.children)
+                    ]
+                )
             yield verb, event
 
     def reverse_iter(self):
@@ -149,11 +161,12 @@ class TwimlIR(object):
             visited.add(verb)
             yield verb
 
-    @property
-    def verb_names(self):
+    def get_verb_names(self, exclude_ssml_verbs=True):
         """Return a set of all verbs used."""
         verb_names = set()
         for verb, event in self:
+            if exclude_ssml_verbs and verb.is_ssml:
+                continue
             verb_names.add(verb.name)
         return sorted(list(verb_names))
 
@@ -161,12 +174,13 @@ class TwimlIR(object):
 class TwimlIRVerb(object):
     """Internal Representation of a TwiML verb."""
 
-    def __init__(self, name, attributes, text, parent, tail):
-        self.name = name
+    def __init__(self, name, attributes, text, parent, tail, is_ssml):
+        self.name = name.replace('-', '_')
         self.attributes = dict(attributes)
         self.text = text
         self.parent = parent
         self.tail = tail
+        self.is_ssml = is_ssml
 
         self.children = []
 
