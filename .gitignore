@@ -1,5 +1,6 @@
 generators
 lib
+dotnet_env
 
 # PHP Composer
 composer.json

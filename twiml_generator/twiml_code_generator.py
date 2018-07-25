@@ -2,6 +2,7 @@
 # coding: utf-8
 import json
 import logging
+import os
 import shutil
 import subprocess
 
@@ -50,6 +51,7 @@ class TwimlCodeGenerator(object):
             self.lib_filepath = Path(lib_filepath)
         else:
             self.lib_filepath = Path(__file__).parent / '../lib'
+        self.lib_filepath = self.lib_filepath.resolve()
 
         self.specific_imports = set()
         if language == 'java':
@@ -60,6 +62,8 @@ class TwimlCodeGenerator(object):
             self.clean_csharp_specificities()
         elif language == 'ruby':
             self.clean_ruby_specificities()
+        elif language == 'node':
+            self.clean_node_specifities()
 
     def overwrite_language_spec(self, key, value):
         self.language_spec[key] = value
@@ -196,15 +200,12 @@ class TwimlCodeGenerator(object):
 
     def output_wrapper(self, lines):
         """Used to wrap code, structure imports and print out function in a single file."""
-        if self.language_spec.get('code_wrapper'):
-            return self.language_spec['code_wrapper'].format(
-                imports=self.output_imports(),
-                classname=pascalize(underscore(str(self.twiml_filepath.name)[:-4])),
-                code=self.output_padded_code(lines),
-                print=self.output_padded_code(self.output_print().split('\n'))
-            )
-        else:
-            return code
+        return self.language_spec['code_wrapper'].format(
+            imports=self.output_imports(),
+            classname=pascalize(underscore(str(self.twiml_filepath.name)[:-4])),
+            code=self.output_padded_code(lines),
+            print=self.output_padded_code(self.output_print().split('\n'))
+        )
 
     def output_padded_code(self, lines):
         """Return a string containing all the lines left padded accordingly."""
@@ -231,16 +232,12 @@ class TwimlCodeGenerator(object):
 
     def method_for_verb(self, verb):
         """Return a formated method name for a given verb."""
-        name = verb.name
-        if verb.is_ssml and self.language_spec.get('ssml_method_have_prefix'):
-            name = f'ssml_{verb.name}'
-
         if self.language_spec.get('method_name_style') == 'camelize':
-            method_name = camelize(name)
+            method_name = camelize(verb.name)
         elif self.language_spec.get('method_name_style') == 'pascalize':
-            method_name = pascalize(name)
+            method_name = pascalize(verb.name)
         else:
-            method_name = name.lower()
+            method_name = verb.name.lower()
 
         return method_name
 
@@ -250,6 +247,7 @@ class TwimlCodeGenerator(object):
 
     def class_for_verb_name(self, verb_name):
         """Return a formated class name for a given verb name."""
+        verb_name = pascalize(verb_name)
         if verb_name == 'Response':
             if self.twimlir.is_voice_response:
                 return self.language_spec['voice_class']
@@ -257,10 +255,6 @@ class TwimlCodeGenerator(object):
                 return self.language_spec['messaging_class']
         elif 'new_klass' in self.language_spec:
             return self.language_spec['new_klass'].format(klass=verb_name)
-        # # Java: variable type, e.g. SsmlBreak
-        # elif verb_name in self.SSML_VERBS:
-        #     verb_name = camelize(verb_name.replace('-', '_').capitalize())
-        #     return f'Ssml{verb_name}'
         else:
             return verb_name
 
@@ -349,7 +343,9 @@ class TwimlCodeGenerator(object):
         for verb, event in self.twimlir:
             # Add imports for SSML
             if verb.is_ssml:
-                import_name = f"import com.twilio.twiml.voice.Ssml{pascalize(verb.name.capitalize().replace('-', '_'))};"
+                verb.variable_name = camelize('ssml_' + verb.name)
+                verb.name = pascalize('ssml_' + verb.name)
+                import_name = f"import com.twilio.twiml.voice.{verb.name};"
                 self.specific_imports.add(import_name)
             if verb.name == 'Enqueue':
                 verb.attributes['queueName'] = verb.text
@@ -386,33 +382,17 @@ class TwimlCodeGenerator(object):
                     verb.attributes.pop('statusCallbackEvent')
                     self.specific_imports.add('import java.util.Arrays;')
             # Clean variables, attributes and imports for SSML methods
-            elif verb.name == 'break':
-                verb.variable_name = '_break'
-                strength = verb.attributes.get('strength')
-                if strength:
-                    verb.attributes['strength'] = f"Strength.{strength.upper().replace('-', '_')}"
-                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlBreak.Strength;')
-            elif verb.name == 'phoneme':
-                alphabet = verb.attributes.get('alphabet')
-                if alphabet:
-                    verb.attributes['alphabet'] = f"Alphabet.{alphabet.upper().replace('-', '_')}"
-                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlPhoneme.Alphabet;')
-            elif verb.name == 'say-as':
-                verb.variable_name = 'sayAs'
-                interpret_as = verb.attributes.get('interpret-as')
-                role = verb.attributes.get('role')
-                if interpret_as:
-                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlSayAs.InterpretAs;')
-                    verb.attributes['interpretAs'] = f"InterpretAs.{interpret_as.upper().replace('-', '_')}"
-                    verb.attributes.pop('interpret-as')
-                if role:
-                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlSayAs.Role;')
-                    verb.attributes['role'] = f"Role.{role.upper().replace('-', '_')}"
-            elif verb.name == 'emphasis':
-                level = verb.attributes.get('level')
-                if level:
-                    self.specific_imports.add('import com.twilio.twiml.voice.SsmlEmphasis.Level;')
-                    verb.attributes['level'] = f"Level.{level.upper().replace('-', '_')}"
+            elif verb.name == 'SsmlBreak':
+                self.java_enumize(verb, 'strength')
+            elif verb.name == 'SsmlPhoneme':
+                self.java_enumize(verb, 'alphabet')
+            elif verb.name == 'SsmlSayAs':
+                if 'interpret-as' in verb.attributes:
+                    verb.attributes['interpretAs'] = verb.attributes.pop('interpret-as')
+                self.java_enumize(verb, 'interpretAs')
+                self.java_enumize(verb, 'role')
+            elif verb.name == 'SsmlEmphasis':
+                self.java_enumize(verb, 'level')
 
     def java_enumize(self, verb, attr_name):
         if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
@@ -426,6 +406,8 @@ class TwimlCodeGenerator(object):
     def clean_python_specificities(self):
         """Python library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
+            if verb.is_ssml:
+                verb.name = f'ssml_{verb.name}'
             if 'from' in verb.attributes:
                 verb.attributes['from_'] = verb.attributes.pop('from')
             if verb.name == 'Play' and not verb.text:
@@ -437,6 +419,8 @@ class TwimlCodeGenerator(object):
     def clean_csharp_specificities(self):
         """C# library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
+            if verb.is_ssml:
+                verb.name = pascalize(f'ssml_{verb.name}')
             if verb.name == 'Play' and not verb.text:
                 verb.text = ' '
             elif verb.name == 'Redirect' and self.twimlir.is_messaging_response:
@@ -460,6 +444,11 @@ class TwimlCodeGenerator(object):
             elif verb.name == 'Dial' and verb.text:
                 verb.attributes['number'] = verb.text
                 verb.text = None
+
+    def clean_node_specifities(self):
+        for verb, event in self.twimlir:
+            if verb.is_ssml:
+                verb.name = camelize(f'ssml_{verb.name}')
 
     def write_code(self):
         """Write the code in the generator file."""
@@ -519,7 +508,7 @@ class TwimlCodeGenerator(object):
 
         example_filepath = Path('Example.java')
         class_filepath = Path('Example.class')
-        jar_filepath = self.lib_filepath / 'twilio-7.15.7-SNAPSHOT-jar-with-dependencies.jar'
+        jar_filepath = self.lib_filepath / 'twilio-7.22.0-jar-with-dependencies.jar'
 
         def java_cleanup():
             try:
@@ -545,47 +534,46 @@ class TwimlCodeGenerator(object):
         return p
 
     def verify_csharp(self):
-        if not shutil.which('mono'):
-            raise Exception('You need to install mono if you want to verify a C# file')
+        if not shutil.which('dotnet'):
+            raise Exception('You need to install dotnet core if you want to verify a C# file')
 
-        app_filepath = Path('Example.app')
-        exe_filepath = Path('example.exe')
+        is_new_env = False
+        cwd = Path.cwd()
+        project_filepath = Path('dotnet_env')
+        if not project_filepath.exists():
+            project_filepath.mkdir()
+            is_new_env = True
+        os.chdir(project_filepath)
 
         def csharp_clean():
             try:
-                exe_filepath.unlink()
-                shutil.rmtree('Example.app')
+                os.chdir(cwd)
             except OSError:
                 pass
 
-        csharp_clean()
+        dotnet_new_command = ['dotnet', 'new', 'console']
+        dotnet_add_package_command = ['dotnet', 'add', 'package', 'Twilio']
+        dotnet_run_command = ['dotnet', 'run']
 
-        twilio_lib_filepath = self.lib_filepath / 'net35/Twilio.dll'
-        json_lib_filepath = self.lib_filepath / 'net35/Newtonsoft.Json.dll'
-        jwt_lib_filepath = self.lib_filepath / 'net35/JWT.dll'
-        libs_filepath = [twilio_lib_filepath, json_lib_filepath, jwt_lib_filepath]
-        libs_paths = ','.join([str(fp) for fp in libs_filepath])
+        if is_new_env:
+            logger.debug('Running: {}'.format(' '.join(dotnet_new_command)))
+            p = subprocess.run(dotnet_new_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if p.returncode != 0:
+                csharp_clean()
+                return p
 
-        mcs_command = ['mcs', '-r:' + libs_paths,
-                       '-out:' + str(exe_filepath), str(self.code_filepath)]
-        macpack_command = ['macpack', '-r:' + libs_paths,
-                           '-m:2', '-o:.', '-n:Example', '-a:' + str(exe_filepath)]
-        mono_command = ['mono', str(app_filepath / 'Contents/Resources/Example.exe')]
+            logger.debug('Running: {}'.format(' '.join(dotnet_add_package_command)))
+            p = subprocess.run(dotnet_add_package_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if p.returncode != 0:
+                csharp_clean()
+                return p
 
-        logger.debug('Running: {}'.format(' '.join(mcs_command)))
-        p = subprocess.run(mcs_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if p.returncode != 0:
-            csharp_clean()
-            return p
+        program_path = Path('Program.cs')
+        program_path.unlink()
+        program_path.symlink_to(self.code_filepath)
 
-        logger.debug('Running: {}'.format(' '.join(macpack_command)))
-        p = subprocess.run(macpack_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if p.returncode != 0:
-            csharp_clean()
-            return p
-
-        logger.debug('Running: {}'.format(' '.join(mono_command)))
-        p = subprocess.run(mono_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logger.debug('Running: {}'.format(' '.join(dotnet_run_command)))
+        p = subprocess.run(dotnet_run_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         csharp_clean()
         return p
 

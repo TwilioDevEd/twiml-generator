@@ -8,7 +8,7 @@
   "text_format": "{text}, ",
   "attribute_format": "{name}: {value}",
   "use_semicolon": true,
-  "append": "{parent}.{klass}({variable});",
+  "append": "{parent}.Append({variable});",
   "chain_calls": false,
 
 
@@ -20,8 +20,8 @@
   "ssml_method_have_prefix": true,
 
   "add_imports": "fixed",
-  "import_voice": "using Twilio.TwiML;",
-  "import_messaging": "using Twilio.TwiML;",
+  "import_voice": "using Twilio.TwiML;\nusing Twilio.TwiML.Voice;",
+  "import_messaging": "using Twilio.TwiML;\nusing Twilio.TwiML.Messaging;",
   "new_variable": "var {variable} = new {klass}({text}{attributes});",
   "new_leaf": "{parent}.{method}({text}{attributes});",
   "new_text": "{parent}.AddText(\"{text}\");",
