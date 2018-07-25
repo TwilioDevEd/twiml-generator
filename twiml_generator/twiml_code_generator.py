@@ -183,6 +183,7 @@ class TwimlCodeGenerator(object):
         return self.language_spec['new_text'].format(
             parent=self.variable_for_verb(verb.parent),
             text=verb.tail.rstrip(),
+            indent=self.indent_for_verb(verb)
         )
 
     def output_append(self, verb):

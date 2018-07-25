@@ -18,7 +18,7 @@
   "new_block": "{indent}{parent}.{variable}({text}{attributes}) do |{variable}|",
   "new_variable": "{indent}{variable} = {klass}.new({text}{attributes})",
   "new_leaf": "{indent}{parent}.{method}({text}{attributes})",
-  "new_text": "{parent}.append('{text}')",
+  "new_text": "{indent}{parent}.append('{text}')",
   "new_klass": "Twilio::TwiML::{klass}",
   "append": "end",
   "print": "puts response",
