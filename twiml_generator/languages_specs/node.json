@@ -15,7 +15,6 @@
   "code_wrapper_padding": 0,
 
   "method_name_style": "camelize",
-  "ssml_method_have_prefix": true,
 
   "add_imports": "fixed",
   "import_voice": "const VoiceResponse = require('twilio').twiml.VoiceResponse;",

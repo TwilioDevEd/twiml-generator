@@ -34,7 +34,6 @@ def load_language_spec(language):
 
 class TwimlCodeGenerator(object):
     """Class to generate the necessary code for outputing a given TwiML."""
-    JAVA_SSML_CLASS_ATTRIBUTES = ['strength', 'alphabet', 'interpretAs', 'role', 'level']
 
     def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python'):
         self.language_spec = load_language_spec(language)
@@ -309,10 +308,6 @@ class TwimlCodeGenerator(object):
                 value = value.decode('utf-8')
             else:
                 value = repr(value)
-            # Some Java SSML attributes are classes, this strips the " from the string
-            # making it a real class. E.g.: "Strenght.X-WEAK" to Strength.X-WEAK
-            if name in self.JAVA_SSML_CLASS_ATTRIBUTES and self.language_spec.get('language') == 'java':
-                value = value.strip('"')
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
         return built_attributes
 
@@ -342,7 +337,6 @@ class TwimlCodeGenerator(object):
     def clean_java_specificities(self):
         """Java library specificities which requires to change the TwiML IR."""
         for verb, event in self.twimlir:
-            # Add imports for SSML
             if verb.is_ssml:
                 verb.variable_name = camelize('ssml_' + verb.name)
                 verb.name = pascalize('ssml_' + verb.name)
