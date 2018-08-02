@@ -439,6 +439,13 @@ class TwimlCodeGenerator(object):
             elif verb.name == 'Dial' and verb.text:
                 verb.attributes['number'] = verb.text
                 verb.text = None
+            elif verb.name == 'say-as':
+                verb.name = 'say_as'
+            # the `message` is optional and should be passed as a keyword argument
+            elif verb.name == 'Say':
+                if verb.text:
+                    verb.attributes['message'] = verb.text
+                    verb.text = ''
 
     def clean_node_specifities(self):
         for verb, event in self.twimlir:
