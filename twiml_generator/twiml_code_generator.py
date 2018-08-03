@@ -308,6 +308,9 @@ class TwimlCodeGenerator(object):
                 value = value.decode('utf-8')
             else:
                 value = repr(value)
+            if self.language_spec.get('language') == 'node' and name == 'interpret_as':
+                name = "'interpret-as'"
+
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
         return built_attributes
 
