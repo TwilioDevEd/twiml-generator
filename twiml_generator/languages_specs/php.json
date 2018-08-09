@@ -20,7 +20,7 @@
   "new_variable": "${variable} = new {klass}({attributes});",
   "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
   "new_leaf": "${parent}->{method}({text}{attributes});",
-  "new_text": "",
+  "new_text": "${parent}->append('{text}');",
   "append": "",
   "print": "echo $response;"
 }
