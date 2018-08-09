@@ -311,6 +311,9 @@ class TwimlCodeGenerator(object):
             # The Node interpret-as parameter needs to be surrounded by quotes, since it uses a dash
             if self.language_spec.get('language') == 'node' and name == 'interpret_as':
                 name = "'interpret-as'"
+            # The Ruby interpret-as parameter is not idiomatic, being the only one in camelCase
+            if self.language_spec.get('language') == 'ruby' and name == 'interpret_as':
+                name = 'interpretAs'
 
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))
         return built_attributes
@@ -443,8 +446,6 @@ class TwimlCodeGenerator(object):
             elif verb.name == 'Dial' and verb.text:
                 verb.attributes['number'] = verb.text
                 verb.text = None
-            elif verb.name == 'say-as':
-                verb.name = 'say_as'
             # the `message` is optional and should be passed as a keyword argument
             elif verb.name == 'Say':
                 if verb.text:
