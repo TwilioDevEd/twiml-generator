@@ -63,6 +63,8 @@ class TwimlCodeGenerator(object):
             self.clean_ruby_specificities()
         elif language == 'node':
             self.clean_node_specifities()
+        elif language == 'php':
+            self.clean_php_specifities()
 
     def overwrite_language_spec(self, key, value):
         self.language_spec[key] = value
@@ -456,6 +458,11 @@ class TwimlCodeGenerator(object):
         for verb, event in self.twimlir:
             if verb.is_ssml:
                 verb.name = camelize(f'ssml_{verb.name}')
+
+    def clean_php_specifities(self):
+        for verb, event in self.twimlir:
+            if verb.name == 'break':
+                verb.name = 'break_'
 
     def write_code(self):
         """Write the code in the generator file."""
