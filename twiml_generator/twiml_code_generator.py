@@ -234,6 +234,10 @@ class TwimlCodeGenerator(object):
 
     def method_for_verb(self, verb):
         """Return a formated method name for a given verb."""
+        # Workaround for non ideomatic PHP method name `say_As`
+        if self.language_spec.get('language') == 'php' and verb.name == 'say_as':
+            return 'say_As'
+
         if self.language_spec.get('method_name_style') == 'camelize':
             method_name = camelize(verb.name)
         elif self.language_spec.get('method_name_style') == 'pascalize':
