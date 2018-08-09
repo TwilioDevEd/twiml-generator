@@ -178,7 +178,7 @@ class TwimlCodeGenerator(object):
         )
 
     def output_new_text(self, verb):
-        """"""
+        """Return the method that outputs text outside XML tags."""
         return self.language_spec['new_text'].format(
             parent=self.variable_for_verb(verb.parent),
             text=verb.tail.rstrip(),
