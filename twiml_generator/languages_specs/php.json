@@ -2,7 +2,7 @@
   "language": "php",
   "extension": ".php",
 
-  "voice_class": "TwiML",
+  "voice_class": "VoiceResponse",
   "messaging_class": "TwiML",
 
   "text_format": "{text}, ",
@@ -15,7 +15,7 @@
   "method_name_style": "camelize",
 
   "add_imports": "fixed",
-  "import_voice": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML;",
+  "import_voice": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML\\VoiceResponse;",
   "import_messaging": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML;",
   "new_variable": "${variable} = new {klass}({attributes});",
   "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
