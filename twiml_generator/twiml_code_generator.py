@@ -315,7 +315,7 @@ class TwimlCodeGenerator(object):
             else:
                 value = repr(value)
             # The Node interpret-as parameter needs to be surrounded by quotes, since it uses a dash
-            if self.language_spec.get('language') == 'node' and name == 'interpret_as':
+            if self.language_spec.get('language') == 'node' and name == 'interpretAs':
                 name = "'interpret-as'"
 
             built_attributes.append(self.language_spec['attribute_format'].format(name=name, value=value))

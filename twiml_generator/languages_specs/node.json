@@ -8,7 +8,7 @@
   "text_format": ", {text}",
   "attribute_format": "{name}: {value}",
   "attributes_wrapper_format": "{{{attributes}}}",
-  "attribute_name_style": "underscore",
+  "attribute_name_style": "camelize",
   "use_semicolon": true,
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",
