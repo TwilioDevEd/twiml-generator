@@ -2,7 +2,7 @@
   "language": "php",
   "extension": ".php",
 
-  "voice_class": "TwiML",
+  "voice_class": "VoiceResponse",
   "messaging_class": "TwiML",
 
   "text_format": "{text}, ",
@@ -12,13 +12,15 @@
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",
   "code_wrapper_padding": 0,
+  "method_name_style": "underscore",
 
   "add_imports": "fixed",
-  "import_voice": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
-  "import_messaging": "<?php\nrequire_once './vendor/autoload.php';\nuse Twilio\\TwiML;",
+  "import_voice": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML\\VoiceResponse;",
+  "import_messaging": "<?php\nrequire_once 'vendor/autoload.php';\nuse Twilio\\TwiML;",
   "new_variable": "${variable} = new {klass}({attributes});",
   "new_block": "${variable} = ${parent}->{variable}({text}{attributes});",
   "new_leaf": "${parent}->{method}({text}{attributes});",
+  "new_text": "${parent}->append('{text}');",
   "append": "",
   "print": "echo $response;"
 }

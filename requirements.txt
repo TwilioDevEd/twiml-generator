@@ -1,7 +1,6 @@
-lxml==3.7.3
-twilio==6.1.2
+twilio==6.15.1
 inflection==0.3.1
 yapf==0.16.2
 jsbeautifier==1.6.14
 lxml==4.2.3
-inflection=0.3.1
+inflection==0.3.1

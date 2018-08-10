@@ -8,7 +8,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("twiml_filepath", help="Path to a TwiML file")
     parser.add_argument("-l", "--language", help="Language for the code to generate",
-                        choices=['csharp', 'java', 'node', 'php', 'python'])
+                        choices=['csharp', 'java', 'node', 'php', 'python', 'ruby'])
     args = parser.parse_args()
 
     code_generator = TwimlCodeGenerator(args.twiml_filepath, language=args.language)

@@ -17,6 +17,7 @@
   "import_messaging": "from twilio.twiml.messaging_response import {imports}",
   "new_variable": "{variable} = {klass}({text}{attributes})",
   "new_leaf": "{parent}.{method}({text}{attributes})",
+  "new_text": "{parent}.append('{text}')",
   "append": "{parent}.append({variable})",
   "print": "print(response)",
   "formatter": "yapf -i {filepath}"
