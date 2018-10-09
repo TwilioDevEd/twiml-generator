@@ -46,7 +46,7 @@ code_generator.verify()
 
 ## Requirements
 The generator tool will try to test the generated snippets using a local
-environment for every language
+environment for every language's SDK version.
 
 * `csharp`: Install .NET Core
 * `java`: Install Java and copy the current version of Twilio SDK jar
