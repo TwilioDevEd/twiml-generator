@@ -519,7 +519,7 @@ class TwimlCodeGenerator(object):
 
         example_filepath = Path('Example.java')
         class_filepath = Path('Example.class')
-        jar_filepath = self.lib_filepath / 'twilio-7.22.0-jar-with-dependencies.jar'
+        jar_filepath = self.lib_filepath / '*'
 
         def java_cleanup():
             try:
