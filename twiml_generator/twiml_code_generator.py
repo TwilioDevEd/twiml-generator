@@ -11,6 +11,7 @@ from lxml import etree
 from inflection import underscore
 from inflection import camelize as pascalize
 
+from twiml_generator.specificity import java, csharp, rename_attr
 from .twimlir import TwimlIR
 
 logging.basicConfig(level=logging.DEBUG)
@@ -267,6 +268,8 @@ class TwimlCodeGenerator(object):
         """Return the text quoted for the language."""
         if not verb.text:
             return ''
+        if isinstance(verb.text, bytes):
+            return verb.text.decode('utf-8')
         if verb.text == ' ':
             verb.text = ''
         quote = self.language_spec.get('string_quote', "'")
@@ -351,113 +354,19 @@ class TwimlCodeGenerator(object):
                 verb.name = pascalize('ssml_' + verb.name)
                 import_name = f"import com.twilio.twiml.voice.{verb.name};"
                 self.specific_imports.add(import_name)
-            if verb.name == 'Enqueue':
-                verb.attributes['queueName'] = verb.text
-                verb.text = None
-            elif verb.name == 'Play':
-                if not verb.text:
-                    verb.text = ' '
-            elif verb.name == 'Dial':
-                self.java_enumize(verb, 'record')
-                self.java_enumize(verb, 'trim')
-            elif verb.name == 'Reject':
-                self.java_enumize(verb, 'reason')
-            elif verb.name == 'Say':
-                self.java_enumize(verb, 'voice')
-                self.java_enumize(verb, 'language')
-            elif verb.name in ['Client', 'Number', 'Sip']:
-                if 'statusCallbackEvent' in verb.attributes:
-                    verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
-                        ', '.join(
-                            [verb.name + '.Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
-                        )
-                    ).encode('utf-8')
-                    verb.attributes.pop('statusCallbackEvent')
-                    self.specific_imports.add('import java.util.Arrays;')
-            elif verb.name == 'Conference':
-                self.java_enumize(verb, 'beep')
-                self.java_enumize(verb, 'record')
-                if 'statusCallbackEvent' in verb.attributes:
-                    verb.attributes['statusCallbackEvents'] = 'Arrays.asList({})'.format(
-                        ', '.join(
-                            ['Conference.Event.' + event.upper() for event in verb.attributes['statusCallbackEvent'].split(' ')]
-                        )
-                    ).encode('utf-8')
-                    verb.attributes.pop('statusCallbackEvent')
-                    self.specific_imports.add('import java.util.Arrays;')
-            elif verb.name == 'Prompt':
-                self.java_enumize(verb, 'for')
-                self.java_enumize(verb, 'cardType')
-                self.java_enumize(verb, 'errorType')
-                self.java_to_list(verb, "attempt", formatter="{}")
-                if 'cardType' in verb.attributes:
-                    verb.attributes['cardTypes'] = verb.attributes.pop('cardType')
-                if 'errorType' in verb.attributes:
-                    verb.attributes['errorTypes'] = verb.attributes.pop('errorType')
-                if 'attempt' in verb.attributes:
-                    verb.attributes['attempts'] = verb.attributes.pop('attempt')
-            elif verb.name == 'Pay':
-                self.java_enumize(verb, 'language')
-                self.java_enumize(verb, 'validCardTypes')
-                self.java_to_list(verb, 'validCardTypes')
-                self.attr_to_bytes(verb, 'maxAttempts')
-                self.attr_to_bytes(verb, 'timeout')
 
-            # Clean variables, attributes and imports for SSML methods
-            elif verb.name == 'SsmlBreak':
-                self.java_enumize(verb, 'strength')
-            elif verb.name == 'SsmlPhoneme':
-                self.java_enumize(verb, 'alphabet')
-            elif verb.name == 'SsmlSayAs':
-                if 'interpret-as' in verb.attributes:
-                    verb.attributes['interpretAs'] = verb.attributes.pop('interpret-as')
-                self.java_enumize(verb, 'interpretAs')
-                self.java_enumize(verb, 'role')
-            elif verb.name == 'SsmlEmphasis':
-                self.java_enumize(verb, 'level')
+            java.verb_processing(verb, self)
 
-            # Replace 'for' attribute with safe value
-            if 'for' in verb.attributes:
-                verb.attributes['for_'] = verb.attributes.pop('for')
-
-    def java_enumize(self, verb, attr_name):
-        if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
-            attr_values = []
-            for value in verb.attributes[attr_name].split(' '):
-                attr_value = [
-                    verb.name,
-                    pascalize(attr_name),
-                    underscore(value).upper().replace('.', '_')
-                ]
-                attr_values.append('.'.join(attr_value))
-            verb.attributes[attr_name] = ' '.join(attr_values).encode('utf-8')
-
-    def java_to_list(self, verb, attr_name, formatter='{}', force=False):
-        if attr_name not in verb.attributes:
-            return
-        value = verb.attributes[attr_name]
-        if isinstance(value, bytes):
-            if value.startswith(b'Arrays.asList'):
-                return
-            value = value.decode('utf-8')
-        if ' ' in value or force:
-            verb.attributes[attr_name] = 'Arrays.asList({})'.format(
-                ', '.join(
-                    [formatter.format(v) for v in value.split(' ')]
-                )
-            ).encode('utf-8')
-            if 'import java.util.Arrays;' not in self.specific_imports:
-                self.specific_imports.add('import java.util.Arrays;')
+            rename_attr(verb, 'for', 'for_')
 
     def clean_python_specificities(self):
-        """Python library specificities which requires to change the TwiML IR."""
+        """Python library specificities which requires to change the TwiML IR.
+        """
         for verb, event in self.twimlir:
             if verb.is_ssml:
                 verb.name = f'ssml_{verb.name}'
-            if 'from' in verb.attributes:
-                verb.attributes['from_'] = verb.attributes.pop('from')
-            if 'for' in verb.attributes:
-                verb.attributes['for_'] = verb.attributes.pop('for')
+            rename_attr(verb, 'from', 'from_')
+            rename_attr(verb, 'for', 'for_')
             if verb.name == 'Play' and not verb.text:
                 verb.text = ' '
             for name, value in verb.attributes.items():
@@ -469,22 +378,7 @@ class TwimlCodeGenerator(object):
         for verb, event in self.twimlir:
             if verb.is_ssml:
                 verb.name = pascalize(f'ssml_{verb.name}')
-            # TODO: Fix for Play Uri parameter required
-            if verb.name == 'Play' and not verb.text:
-                verb.text = ' '
-            elif verb.name == 'Prompt':
-                self.csharp_enumize(verb, 'errorType')
-                self.csharp_to_list(verb, 'errorType', force=True)
-                self.csharp_enumize(verb, 'cardType')
-                self.csharp_to_list(verb, 'cardType', force=True)
-                self.csharp_to_list(verb, 'attempt', force=True)
-            elif verb.name == 'Pay':
-                self.csharp_enumize(verb, 'validCardTypes')
-                self.csharp_to_list(verb, 'validCardTypes', force=True)
-                self.attr_to_bytes(verb, 'timeout')
-                self.attr_to_bytes(verb, 'maxAttempts')
-
-            elif verb.name == 'Redirect' and self.twimlir.is_messaging_response:
+            if verb.name == 'Redirect' and self.twimlir.is_messaging_response:
                 verb.attributes['url'] = verb.text
                 verb.text = None
             elif verb.name == 'say-as':
@@ -492,43 +386,8 @@ class TwimlCodeGenerator(object):
                 if interpret_as:
                     verb.attributes['interpretAs'] = interpret_as
                     verb.attributes.pop('interpret-as')
-            if 'for' in verb.attributes:
-                verb.attributes['for_'] = verb.attributes.pop('for')
-
-    def attr_to_bytes(self, verb, attr_name):
-        if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
-            verb.attributes[attr_name] = verb.attributes[attr_name].encode('utf-8')
-
-    def csharp_enumize(self, verb, attr_name):
-        """Convert value to Enum. Supports multiple values space separated"""
-        if attr_name in verb.attributes and not isinstance(verb.attributes[attr_name], bytes):
-            attr_values = []
-            for value in verb.attributes[attr_name].split(' '):
-                attr_value = [
-                    verb.name,
-                    pascalize(attr_name + "Enum"),
-                    pascalize(underscore(value))
-                ]
-                attr_values.append('.'.join(attr_value))
-            verb.attributes[attr_name] = ' '.join(attr_values).encode('utf-8')
-
-    def csharp_to_list(self, verb, attr_name, formatter='{}', force=False):
-        if attr_name not in verb.attributes:
-            return
-        value = verb.attributes[attr_name]
-        if isinstance(value, bytes):
-            if value.startswith(b'new []'):
-                return
-            value = value.decode('utf-8')
-
-        if ' ' in value or force:
-            verb.attributes[attr_name] = 'new []{{{}}}.ToList()'.format(
-                ', '.join(
-                    [formatter.format(v) for v in value.split(' ')]
-                )
-            ).encode('utf-8')
-            if 'using System.Linq;' not in self.specific_imports:
-                self.specific_imports.add('using System.Linq;')
+            csharp.verb_processing(verb, self)
+            rename_attr(verb, 'for', 'for_')
 
     def clean_ruby_specificities(self):
         """Ruby library specificities which requires to change the TwiML IR."""
