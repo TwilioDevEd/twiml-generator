@@ -11,7 +11,7 @@ from lxml import etree
 from inflection import underscore
 from inflection import camelize as pascalize
 
-from twiml_generator.specificity import java, csharp, rename_attr
+from twiml_generator.specificity import Specificities
 from .twimlir import TwimlIR
 
 logging.basicConfig(level=logging.DEBUG)
@@ -35,6 +35,7 @@ def load_language_spec(language):
 
 class TwimlCodeGenerator(object):
     """Class to generate the necessary code for outputing a given TwiML."""
+    __specificities = Specificities()
 
     def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python'):
         self.language_spec = load_language_spec(language)
@@ -54,18 +55,7 @@ class TwimlCodeGenerator(object):
         self.lib_filepath = self.lib_filepath.resolve()
 
         self.specific_imports = set()
-        if language == 'java':
-            self.clean_java_specificities()
-        elif language == 'python':
-            self.clean_python_specificities()
-        elif language == 'csharp':
-            self.clean_csharp_specificities()
-        elif language == 'ruby':
-            self.clean_ruby_specificities()
-        elif language == 'node':
-            self.clean_node_specifities()
-        elif language == 'php':
-            self.clean_php_specifities()
+        self.__specificities.clean(self, language)
 
     def overwrite_language_spec(self, key, value):
         self.language_spec[key] = value
@@ -345,77 +335,6 @@ class TwimlCodeGenerator(object):
             return ''.join(chain)
         else:
             return ''
-
-    def clean_java_specificities(self):
-        """Java library specificities which requires to change the TwiML IR."""
-        for verb, event in self.twimlir:
-            if verb.is_ssml:
-                verb.variable_name = camelize('ssml_' + verb.name)
-                verb.name = pascalize('ssml_' + verb.name)
-                import_name = f"import com.twilio.twiml.voice.{verb.name};"
-                self.specific_imports.add(import_name)
-
-            java.verb_processing(verb, self)
-
-            rename_attr(verb, 'for', 'for_')
-
-    def clean_python_specificities(self):
-        """Python library specificities which requires to change the TwiML IR.
-        """
-        for verb, event in self.twimlir:
-            if verb.is_ssml:
-                verb.name = f'ssml_{verb.name}'
-            rename_attr(verb, 'from', 'from_')
-            rename_attr(verb, 'for', 'for_')
-            if verb.name == 'Play' and not verb.text:
-                verb.text = ' '
-            for name, value in verb.attributes.items():
-                if value in ['true', 'false']:
-                    verb.attributes[name] = pascalize(value).encode('utf-8')
-
-    def clean_csharp_specificities(self):
-        """C# library specificities which requires to change the TwiML IR."""
-        for verb, event in self.twimlir:
-            if verb.is_ssml:
-                verb.name = pascalize(f'ssml_{verb.name}')
-            if verb.name == 'Redirect' and self.twimlir.is_messaging_response:
-                verb.attributes['url'] = verb.text
-                verb.text = None
-            elif verb.name == 'say-as':
-                interpret_as = verb.attributes.get('interpret-as')
-                if interpret_as:
-                    verb.attributes['interpretAs'] = interpret_as
-                    verb.attributes.pop('interpret-as')
-            csharp.verb_processing(verb, self)
-            rename_attr(verb, 'for', 'for_')
-
-    def clean_ruby_specificities(self):
-        """Ruby library specificities which requires to change the TwiML IR."""
-        for verb, event in self.twimlir:
-            if verb.name == 'Play' and verb.text:
-                verb.attributes['url'] = verb.text
-                verb.text = None
-            elif verb.name == 'Message' and verb.text:
-                verb.attributes['body'] = verb.text
-                verb.text = None
-            elif verb.name == 'Dial' and verb.text:
-                verb.attributes['number'] = verb.text
-                verb.text = None
-            # the `message` is optional and should be passed as a keyword argument
-            elif verb.name == 'Say':
-                if verb.text:
-                    verb.attributes['message'] = verb.text
-                    verb.text = ''
-
-    def clean_node_specifities(self):
-        for verb, event in self.twimlir:
-            if verb.is_ssml:
-                verb.name = camelize(f'ssml_{verb.name}')
-
-    def clean_php_specifities(self):
-        for verb, event in self.twimlir:
-            if verb.name == 'break':
-                verb.name = 'break_'
 
     def write_code(self):
         """Write the code in the generator file."""

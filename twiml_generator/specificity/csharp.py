@@ -2,21 +2,8 @@ from functools import partial
 
 from inflection import camelize, underscore
 
-from twiml_generator.specificity import to_list as attr_to_list, to_bytes
-
-
-def verb_processing(verb, generator):
-    """Process the verb with its respective class if exists"""
-
-    # Add any new verb class to this list to be processed
-    verbs = [Prompt, Pay, Play]
-    try:
-        class_ = eval(verb.name)
-    except NameError:
-        pass
-    else:
-        if class_ in verbs:
-            class_.process(verb, generator.specific_imports)
+from twiml_generator.specificity.common import attr_to_list, to_bytes, \
+    Language, rename_attr
 
 
 def to_list(verb, attr_name, imports, **kwargs):
@@ -56,6 +43,22 @@ def to_uri(verb, attr_name):
         verb.attributes[attr_name] = build_uri(verb.attributes[attr_name])
 
 
+class CSharp(Language):
+    _classes = {}
+
+    @classmethod
+    def clean(cls, generator) -> None:
+        """C# library specificities which requires to change the TwiML IR."""
+        for verb, event in generator.twimlir:
+            rename_attr(verb, 'for', 'for_')
+
+            if verb.is_ssml:
+                verb.name = camelize(f'ssml_{verb.name}')
+
+            cls.verb_processing(verb, generator.specific_imports)
+
+
+@CSharp.register
 class Prompt:
 
     @classmethod
@@ -72,6 +75,7 @@ class Prompt:
         to_bytes(verb, 'attempt')
 
 
+@CSharp.register
 class Pay:
 
     @classmethod
@@ -85,6 +89,7 @@ class Pay:
         to_bytes(verb, 'maxAttempts')
 
 
+@CSharp.register
 class Play:
 
     @classmethod
@@ -92,4 +97,35 @@ class Play:
         if not verb.text:
             verb.text = ' '
         verb.text = build_uri(verb.text).encode('utf-8')
+        imports.add("using System;")
+
+
+@CSharp.register
+class SayAs:
+    name = "say-as"
+
+    @classmethod
+    def process(cls, verb, imports):
+        rename_attr(verb, 'interpret-as', 'interpretAs')
+
+
+@CSharp.register
+class Redirect:
+
+    @classmethod
+    def process(cls, verb, imports):
+        verb.attributes['url'] = verb.text
+        verb.text = None
+        to_uri(verb, 'url')
+        to_bytes(verb, 'url')
+        imports.add("using System;")
+
+
+@CSharp.register
+class Gather:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
         imports.add("using System;")

@@ -2,23 +2,8 @@ from functools import partial
 
 from inflection import underscore, camelize
 
-from twiml_generator.specificity import to_list as attr_to_list, to_bytes, \
-    rename_attr
-
-
-def verb_processing(verb, generator):
-    """Process the verb with its respective class if exists"""
-
-    # Add any new verb class to this list to be processed
-    verbs = [Prompt, Pay, Conference, Client, Number, Sip, Say, Reject, Dial,
-             Enqueue, Play, SsmlBreak, SsmlEmphasis, SsmlPhoneme, SsmlSayAs]
-    try:
-        class_ = eval(verb.name)
-    except NameError:
-        pass
-    else:
-        if class_ in verbs:
-            class_.process(verb, generator.specific_imports)
+from twiml_generator.specificity.common import attr_to_list, to_bytes, \
+    rename_attr, Language
 
 
 def to_list(verb, attr_name, imports, **kwargs):
@@ -46,6 +31,28 @@ def to_enum(verb, attr_name):
                                                verb.attributes[attr_name])
 
 
+class Java(Language):
+
+    _classes = {}
+
+    @classmethod
+    def clean(cls, generator) -> None:
+        """Java library specificities which requires to change the TwiML IR."""
+
+        for verb, event in generator.twimlir:
+            if verb.is_ssml:
+                verb.variable_name = camelize('ssml_' + verb.name,
+                                              uppercase_first_letter=False)
+                verb.name = camelize('ssml_' + verb.name)
+                import_name = f"import com.twilio.twiml.voice.{verb.name};"
+                generator.specific_imports.add(import_name)
+
+            cls.verb_processing(verb, generator.specific_imports)
+
+            rename_attr(verb, 'for', 'for_')
+
+
+@Java.register
 class Say:
 
     @classmethod
@@ -57,6 +64,7 @@ class Say:
         to_bytes(verb, 'language')
 
 
+@Java.register
 class Reject:
 
     @classmethod
@@ -65,6 +73,7 @@ class Reject:
         to_bytes(verb, 'reason')
 
 
+@Java.register
 class Dial:
 
     @classmethod
@@ -76,6 +85,7 @@ class Dial:
         to_bytes(verb, 'trim')
 
 
+@Java.register
 class Enqueue:
 
     @classmethod
@@ -84,6 +94,7 @@ class Enqueue:
         verb.text = None
 
 
+@Java.register
 class Play:
 
     @classmethod
@@ -92,7 +103,7 @@ class Play:
             verb.text = ' '
 
 
-class _Evented:
+class Evented:
 
     @classmethod
     def event_name(cls, name):
@@ -106,19 +117,23 @@ class _Evented:
         rename_attr(verb, 'statusCallbackEvent', 'statusCallbackEvents')
 
 
-class Client(_Evented):
+@Java.register
+class Client(Evented):
     pass
 
 
-class Number(_Evented):
+@Java.register
+class Number(Evented):
     pass
 
 
-class Sip(_Evented):
+@Java.register
+class Sip(Evented):
     pass
 
 
-class Conference(_Evented):
+@Java.register
+class Conference(Evented):
 
     @classmethod
     def process(cls, verb, imports):
@@ -130,6 +145,7 @@ class Conference(_Evented):
         to_bytes(verb, 'record')
 
 
+@Java.register
 class Prompt:
 
     @classmethod
@@ -152,6 +168,7 @@ class Prompt:
         rename_attr(verb, 'attempt', 'attempts')
 
 
+@Java.register
 class Pay:
 
     @classmethod
@@ -167,6 +184,7 @@ class Pay:
         to_bytes(verb, 'timeout')
 
 
+@Java.register
 class SsmlBreak:
 
     @classmethod
@@ -175,6 +193,7 @@ class SsmlBreak:
         to_bytes(verb, 'strength')
 
 
+@Java.register
 class SsmlPhoneme:
 
     @classmethod
@@ -183,6 +202,7 @@ class SsmlPhoneme:
         to_bytes(verb, 'alphabet')
 
 
+@Java.register
 class SsmlSayAs:
 
     @classmethod
@@ -195,6 +215,7 @@ class SsmlSayAs:
         to_bytes(verb, 'role')
 
 
+@Java.register
 class SsmlEmphasis:
 
     @classmethod
