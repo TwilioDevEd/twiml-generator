@@ -33,6 +33,10 @@ def to_enum(verb, attr_name):
 
 
 def build_uri(value):
+    optional_kind = ''
+    if value.startswith('.'):
+        optional_kind = ', UriKind.Relative'
+    return f'new Uri("{value}"{optional_kind})'
     return 'new Uri("{}")'.format(value)
 
 
