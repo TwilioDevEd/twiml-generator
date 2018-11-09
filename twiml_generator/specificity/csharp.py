@@ -37,7 +37,6 @@ def build_uri(value):
     if value.startswith('.'):
         optional_kind = ', UriKind.Relative'
     return f'new Uri("{value}"{optional_kind})'
-    return 'new Uri("{}")'.format(value)
 
 
 def to_uri(verb, attr_name):
@@ -45,6 +44,10 @@ def to_uri(verb, attr_name):
     if attr_name in verb.attributes and not isinstance(
             verb.attributes[attr_name], bytes):
         verb.attributes[attr_name] = build_uri(verb.attributes[attr_name])
+
+
+def build_custom_class(value, custom_class):
+    return f'new {custom_class}("{value}")'
 
 
 class CSharp(Language):
@@ -158,6 +161,18 @@ class Message:
 
 
 @CSharp.register
+class Record:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+        to_uri(verb, 'transcribeCallback')
+        to_bytes(verb, 'transcribeCallback')
+        imports.add("using System;")
+
+
+@CSharp.register
 class Number:
 
     @classmethod
@@ -169,3 +184,16 @@ class Number:
         to_list(verb, 'statusCallbackEvent', imports, force=True,
                 transform=enum_builder(verb, 'Event'))
         to_bytes(verb, 'statusCallbackEvent')
+
+
+@CSharp.register
+class Client:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'statusCallback')
+        to_bytes(verb, 'statusCallback')
+        to_list(verb, 'statusCallbackEvent', imports, force=True,
+                transform=enum_builder(verb, 'Event'))
+        to_bytes(verb, 'statusCallbackEvent')
+        imports.add("using System;")
