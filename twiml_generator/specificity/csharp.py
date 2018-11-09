@@ -105,17 +105,13 @@ class Pay:
         to_uri(verb, 'action')
         to_bytes(verb, 'action')
 
-        imports.add('using System;')
-
 
 @CSharp.register
 class Play:
 
     @classmethod
     def process(cls, verb, imports):
-        if verb.text:
-            text_to_uri(verb)
-            imports.add("using System;")
+        text_to_uri(verb)
 
 
 @CSharp.register
@@ -136,7 +132,6 @@ class Redirect:
         verb.text = None
         to_uri(verb, 'url')
         to_bytes(verb, 'url')
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -149,7 +144,6 @@ class Gather:
         to_list(verb, 'input', imports, force=True,
                 transform=enum_builder(verb, 'Input'))
         to_bytes(verb, 'input')
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -158,7 +152,6 @@ class Media:
     @classmethod
     def process(cls, verb, imports):
         text_to_uri(verb)
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -168,7 +161,6 @@ class Message:
     def process(cls, verb, imports):
         to_uri(verb, 'action')
         to_bytes(verb, 'action')
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -180,7 +172,6 @@ class Record:
         to_bytes(verb, 'action')
         to_uri(verb, 'transcribeCallback')
         to_bytes(verb, 'transcribeCallback')
-        imports.add("using System;")
 
 
 class Evented:
@@ -193,7 +184,6 @@ class Evented:
         to_list(verb, 'statusCallbackEvent', imports, force=True,
                 transform=enum_builder(verb, 'Event'))
         to_bytes(verb, 'statusCallbackEvent')
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -237,7 +227,6 @@ class Conference(Evented):
         to_list(verb, 'recordingStatusCallbackEvent', imports, force=True,
                 transform=enum_builder(verb, 'Event'))
         to_bytes(verb, 'recordingStatusCallbackEvent')
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -264,8 +253,6 @@ class Dial:
         to_enum(verb, 'ringTone')
         to_bytes(verb, 'ringTone')
 
-        imports.add("using System;")
-
 
 @CSharp.register
 class Connect:
@@ -277,8 +264,6 @@ class Connect:
 
         if 'timeout' in verb.attributes:
             verb.attributes.pop('timeout')
-
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -297,8 +282,6 @@ class Enqueue:
         to_uri(verb, 'waitUrl')
         to_bytes(verb, 'waitUrl')
 
-        imports.add("using System;")
-
 
 @CSharp.register
 class Queue:
@@ -307,8 +290,6 @@ class Queue:
     def process(cls, verb, imports):
         to_uri(verb, 'url')
         to_bytes(verb, 'url')
-
-        imports.add("using System;")
 
 
 @CSharp.register
@@ -323,8 +304,6 @@ class Sip(Evented):
         to_uri(verb, 'url')
         to_bytes(verb, 'url')
 
-        imports.add("using System;")
-
 
 @CSharp.register
 class Sms(Evented):
@@ -335,5 +314,3 @@ class Sms(Evented):
 
         to_uri(verb, 'action')
         to_bytes(verb, 'action')
-        imports.add("using System;")
-

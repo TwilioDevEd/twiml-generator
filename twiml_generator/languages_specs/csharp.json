@@ -19,13 +19,13 @@
   "code_wrapper": "{imports}\n\nclass Example\n{{\n    static void Main()\n    {{\n{code}\n{print}    }}\n}}\n",
 
   "add_imports": "fixed",
-  "import_voice": "using Twilio.TwiML;\nusing Twilio.TwiML.Voice;",
-  "import_messaging": "using Twilio.TwiML;\nusing Twilio.TwiML.Messaging;",
+  "import_voice": "using System;\nusing Twilio.TwiML;\nusing Twilio.TwiML.Voice;",
+  "import_messaging": "using System;\nusing Twilio.TwiML;\nusing Twilio.TwiML.Messaging;",
   "new_variable": "var {variable} = new {klass}({text}{attributes});",
   "new_leaf": "{parent}.{method}({text}{attributes});",
   "new_text": "{parent}.AddText(\"{text}\");",
   "chained_append": ".{method}({variable})",
-  "print": "System.Console.WriteLine(response.ToString());",
+  "print": "Console.WriteLine(response.ToString());",
   "string_quote": "\"",
   "attributes_map": {
     "method": {
