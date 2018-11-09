@@ -128,4 +128,7 @@ class Gather:
     def process(cls, verb, imports):
         to_uri(verb, 'action')
         to_bytes(verb, 'action')
+        to_list(verb, 'input', imports, force=True,
+                transform=enum_builder(verb, 'Input'))
+        to_bytes(verb, 'input')
         imports.add("using System;")
