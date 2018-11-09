@@ -34,7 +34,7 @@ def to_enum(verb, attr_name):
 
 def build_uri(value):
     optional_kind = ''
-    if value.startswith('.'):
+    if not value.startswith('/') and not value.startswith('http'):
         optional_kind = ', UriKind.Relative'
     return f'new Uri("{value}"{optional_kind})'
 
@@ -44,10 +44,6 @@ def to_uri(verb, attr_name):
     if attr_name in verb.attributes and not isinstance(
             verb.attributes[attr_name], bytes):
         verb.attributes[attr_name] = build_uri(verb.attributes[attr_name])
-
-
-def build_custom_class(value, custom_class):
-    return f'new {custom_class}("{value}")'
 
 
 class CSharp(Language):
@@ -194,3 +190,96 @@ class Number(Evented):
 class Client(Evented):
     pass
 
+
+@CSharp.register
+class Conference(Evented):
+
+    @classmethod
+    def process(cls, verb, imports):
+        super().process(verb, imports)
+
+        to_enum(verb, 'beep')
+        to_bytes(verb, 'beep')
+
+        to_uri(verb, 'waitUrl')
+        to_bytes(verb, 'waitUrl')
+
+        to_enum(verb, 'record')
+        to_bytes(verb, 'record')
+
+        to_enum(verb, 'region')
+        to_bytes(verb, 'region')
+
+        to_enum(verb, 'trim')
+        to_bytes(verb, 'trim')
+
+        to_uri(verb, 'recordingStatusCallback')
+        to_bytes(verb, 'recordingStatusCallback')
+
+        to_uri(verb, 'eventCallbackUrl')
+        to_bytes(verb, 'eventCallbackUrl')
+
+        to_list(verb, 'recordingStatusCallbackEvent', imports, force=True,
+                transform=enum_builder(verb, 'Event'))
+        to_bytes(verb, 'recordingStatusCallbackEvent')
+        imports.add("using System;")
+
+
+@CSharp.register
+class Dial:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+
+        to_enum(verb, 'record')
+        to_bytes(verb, 'record')
+
+        to_enum(verb, 'trim')
+        to_bytes(verb, 'trim')
+
+        to_uri(verb, 'recordingStatusCallback')
+        to_bytes(verb, 'recordingStatusCallback')
+
+        to_list(verb, 'recordingStatusCallbackEvent', imports, force=True,
+                transform=enum_builder(verb, 'Event'))
+        to_bytes(verb, 'recordingStatusCallbackEvent')
+
+        to_enum(verb, 'ringTone')
+        to_bytes(verb, 'ringTone')
+
+        imports.add("using System;")
+
+
+@CSharp.register
+class Connect:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+
+        if 'timeout' in verb.attributes:
+            verb.attributes.pop('timeout')
+
+        imports.add("using System;")
+
+
+@CSharp.register
+class Room(Evented):
+    pass
+
+
+@CSharp.register
+class Enqueue:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+
+        to_uri(verb, 'waitUrl')
+        to_bytes(verb, 'waitUrl')
+
+        imports.add("using System;")

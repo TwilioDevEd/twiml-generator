@@ -28,11 +28,11 @@
   "print": "System.Console.WriteLine(response.ToString());",
   "string_quote": "\"",
   "attributes_map": {
-    "beep": {
-      "true": "\"true\"",
-      "false": "\"false\""
-    },
     "method": {
+      "GET": "Twilio.Http.HttpMethod.Get",
+      "POST": "Twilio.Http.HttpMethod.Post"
+    },
+    "waitUrlMethod": {
       "GET": "Twilio.Http.HttpMethod.Get",
       "POST": "Twilio.Http.HttpMethod.Post"
     },
