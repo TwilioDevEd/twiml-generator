@@ -34,9 +34,20 @@ def to_enum(verb, attr_name):
 
 def build_uri(value):
     optional_kind = ''
-    if not value.startswith('/') and not value.startswith('http'):
+    if (
+        not value.startswith('/')
+        and not value.startswith('http')
+        and not value.startswith('sip:')
+    ):
         optional_kind = ', UriKind.Relative'
     return f'new Uri("{value}"{optional_kind})'
+
+
+def text_to_uri(verb):
+    if verb.text:
+        verb.text = build_uri(verb.text).encode('utf-8')
+        if verb.attributes:
+            verb.text += b', '
 
 
 def to_uri(verb, attr_name):
@@ -91,16 +102,20 @@ class Pay:
 
         to_bytes(verb, 'maxAttempts')
 
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+
+        imports.add('using System;')
+
 
 @CSharp.register
 class Play:
 
     @classmethod
     def process(cls, verb, imports):
-        if not verb.text:
-            verb.text = ' '
-        verb.text = build_uri(verb.text).encode('utf-8')
-        imports.add("using System;")
+        if verb.text:
+            text_to_uri(verb)
+            imports.add("using System;")
 
 
 @CSharp.register
@@ -142,7 +157,7 @@ class Media:
 
     @classmethod
     def process(cls, verb, imports):
-        verb.text = build_uri(verb.text).encode('utf-8')
+        text_to_uri(verb)
         imports.add("using System;")
 
 
@@ -283,3 +298,42 @@ class Enqueue:
         to_bytes(verb, 'waitUrl')
 
         imports.add("using System;")
+
+
+@CSharp.register
+class Queue:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'url')
+        to_bytes(verb, 'url')
+
+        imports.add("using System;")
+
+
+@CSharp.register
+class Sip(Evented):
+
+    @classmethod
+    def process(cls, verb, imports):
+        super().process(verb, imports)
+
+        text_to_uri(verb)
+
+        to_uri(verb, 'url')
+        to_bytes(verb, 'url')
+
+        imports.add("using System;")
+
+
+@CSharp.register
+class Sms(Evented):
+
+    @classmethod
+    def process(cls, verb, imports):
+        super().process(verb, imports)
+
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+        imports.add("using System;")
+
