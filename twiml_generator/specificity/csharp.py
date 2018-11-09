@@ -151,3 +151,17 @@ class Message:
         to_uri(verb, 'action')
         to_bytes(verb, 'action')
         imports.add("using System;")
+
+
+@CSharp.register
+class Number:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'statusCallback')
+        to_bytes(verb, 'statusCallback')
+        imports.add("using System;")
+
+        to_list(verb, 'statusCallbackEvent', imports, force=True,
+                transform=enum_builder(verb, 'Event'))
+        to_bytes(verb, 'statusCallbackEvent')
