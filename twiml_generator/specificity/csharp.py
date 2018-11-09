@@ -132,3 +132,12 @@ class Gather:
                 transform=enum_builder(verb, 'Input'))
         to_bytes(verb, 'input')
         imports.add("using System;")
+
+
+@CSharp.register
+class Media:
+
+    @classmethod
+    def process(cls, verb, imports):
+        verb.text = build_uri(verb.text).encode('utf-8')
+        imports.add("using System;")
