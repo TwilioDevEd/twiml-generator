@@ -172,28 +172,25 @@ class Record:
         imports.add("using System;")
 
 
-@CSharp.register
-class Number:
+class Evented:
 
     @classmethod
     def process(cls, verb, imports):
         to_uri(verb, 'statusCallback')
         to_bytes(verb, 'statusCallback')
-        imports.add("using System;")
 
         to_list(verb, 'statusCallbackEvent', imports, force=True,
                 transform=enum_builder(verb, 'Event'))
         to_bytes(verb, 'statusCallbackEvent')
+        imports.add("using System;")
 
 
 @CSharp.register
-class Client:
+class Number(Evented):
+    pass
 
-    @classmethod
-    def process(cls, verb, imports):
-        to_uri(verb, 'statusCallback')
-        to_bytes(verb, 'statusCallback')
-        to_list(verb, 'statusCallbackEvent', imports, force=True,
-                transform=enum_builder(verb, 'Event'))
-        to_bytes(verb, 'statusCallbackEvent')
-        imports.add("using System;")
+
+@CSharp.register
+class Client(Evented):
+    pass
+
