@@ -31,6 +31,10 @@
     "beep": {
       "true": "\"true\"",
       "false": "\"false\""
+    },
+    "method": {
+      "GET": "Twilio.Http.HttpMethod.Get",
+      "POST": "Twilio.Http.HttpMethod.Post"
     }
   },
   "use_boolean": true

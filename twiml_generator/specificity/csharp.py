@@ -141,3 +141,13 @@ class Media:
     def process(cls, verb, imports):
         verb.text = build_uri(verb.text).encode('utf-8')
         imports.add("using System;")
+
+
+@CSharp.register
+class Message:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
+        imports.add("using System;")
