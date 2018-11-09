@@ -21,11 +21,13 @@ def attr_to_list(verb, attr_name, formatter='{}', force=False,
             and not isinstance(verb.attributes[attr_name], bytes):
         if ' ' in verb.attributes[attr_name] or force:
             verb.attributes[attr_name] = formatter.format(
-                ', '.join([transform and transform(value) or value for value
-                           in verb.attributes[attr_name].split(' ')])
+                ', '.join([callable(transform) and transform(value) or value
+                           for value in verb.attributes[attr_name].split(' ')])
             )
             return True
-        verb.attributes[attr_name] = transform(verb.attributes[attr_name])
+        value = verb.attributes[attr_name]
+        verb.attributes[attr_name] = callable(transform) and transform(value) \
+                                     or value
     return False
 
 
@@ -57,4 +59,3 @@ class Language:
     @classmethod
     def clean(cls, generator) -> None:
         raise NotImplementedError()
-
