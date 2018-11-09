@@ -425,6 +425,7 @@ class TwimlCodeGenerator(object):
 
         is_new_env = False
         cwd = Path.cwd()
+        absolute_code_filepath = self.code_filepath.resolve()
         project_filepath = Path('dotnet_env')
         if not project_filepath.exists():
             project_filepath.mkdir()
@@ -456,7 +457,7 @@ class TwimlCodeGenerator(object):
 
         program_path = Path('Program.cs')
         program_path.unlink()
-        program_path.symlink_to(self.code_filepath)
+        program_path.symlink_to(absolute_code_filepath)
 
         logger.debug('Running: {}'.format(' '.join(dotnet_run_command)))
         p = subprocess.run(dotnet_run_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
