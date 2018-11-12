@@ -233,3 +233,11 @@ class Gather:
                 transform=enum_builder(verb, 'input'))
         to_bytes(verb, 'inputs')
         rename_attr(verb, 'input', 'inputs')
+
+
+@Java.register
+class Enqueue:
+
+    @classmethod
+    def process(cls, verb, imports):
+        rename_attr(verb, 'queueName', 'name')
