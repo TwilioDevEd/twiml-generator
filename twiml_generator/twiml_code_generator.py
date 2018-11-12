@@ -87,7 +87,7 @@ class TwimlCodeGenerator(object):
                     lines.append(append_line)
             # Method for adding text after a closing tag
             # for example, append() in Python or addText() in node
-            if verb.tail and not verb.tail.startswith('\n'):
+            if verb.tail and verb.tail.strip():
                 lines.append(self.output_new_text(verb))
             if self.language_spec.get('optional_parentheses', False):
                 lines[-1] = lines[-1].replace('()', '')
@@ -177,7 +177,7 @@ class TwimlCodeGenerator(object):
         """Return the method that outputs text outside XML tags."""
         return self.language_spec['new_text'].format(
             parent=self.variable_for_verb(verb.parent),
-            text=verb.tail.rstrip(),
+            text=verb.tail.strip(),
             indent=self.indent_for_verb(verb)
         )
 
