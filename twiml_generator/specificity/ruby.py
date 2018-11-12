@@ -51,4 +51,24 @@ class Say:
         # the `message` is optional and should be passed as a keyword argument
         if verb.text:
             verb.attributes['message'] = verb.text
-            verb.text = ''
+            verb.text = None
+
+
+@Ruby.register
+class Enqueue:
+
+    @classmethod
+    def process(cls, verb, imports):
+        if verb.text:
+            verb.attributes['name'] = verb.text
+            verb.text = None
+
+
+@Ruby.register
+class Client:
+
+    @classmethod
+    def process(cls, verb, imports):
+        if verb.text:
+            verb.attributes['identity'] = verb.text
+            verb.text = None
