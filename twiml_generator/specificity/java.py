@@ -222,3 +222,14 @@ class SsmlEmphasis:
     def process(cls, verb, imports):
         to_enum(verb, 'level')
         to_bytes(verb, 'level')
+
+
+@Java.register
+class Gather:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_list(verb, 'input', imports,
+                transform=enum_builder(verb, 'input'))
+        to_bytes(verb, 'inputs')
+        rename_attr(verb, 'input', 'inputs')
