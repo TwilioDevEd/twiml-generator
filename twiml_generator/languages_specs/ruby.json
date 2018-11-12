@@ -15,7 +15,7 @@
   "add_imports": "single_line",
   "import_voice": "require 'twilio-ruby'",
   "import_messaging": "require 'twilio-ruby'",
-  "new_block": "{indent}{parent}.{variable}({text}{attributes}) do |{variable}|",
+  "new_block": "{indent}{parent}.{method}({text}{attributes}) do |{variable}|",
   "new_variable": "{indent}{variable} = {klass}.new({text}{attributes})",
   "new_leaf": "{indent}{parent}.{method}({text}{attributes})",
   "new_text": "{indent}{parent}.add_text('{text}')",
