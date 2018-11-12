@@ -144,6 +144,7 @@ class TwimlCodeGenerator(object):
         if verb.parent and self.language_spec.get('new_block'):
             return self.language_spec['new_block'].format(
                 variable=self.variable_for_verb(verb),
+                method=self.method_for_verb(verb),
                 parent=self.variable_for_verb(verb.parent),
                 attributes=self.join_attributes_for_verb(verb),
                 klass=self.class_for_verb(verb),
