@@ -327,7 +327,7 @@ class TwimlCodeGenerator(object):
                     variable=self.variable_for_verb(v)
                 ))
                 # Chained addText() method
-                if v.tail and not v.tail.startswith('\n'):
+                if v.tail and v.tail.strip():
                     if self.language_spec['language'] == 'java':
                         # In Java every method is chained, so we need to drop the parent
                         # E.g. ssmlP(p).addText("aaaaaa").ssmlPhoneme(phoneme).addText("bbbbbbb")
