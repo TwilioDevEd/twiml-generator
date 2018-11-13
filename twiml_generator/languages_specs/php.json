@@ -10,7 +10,7 @@
   "attributes_wrapper_format": "[{attributes}]",
   "use_semicolon": true,
   "chain_calls": false,
-  "code_wrapper": "<?php\nrequire_once 'vendor/autoload.php';\n{imports}\n{code}\n{print}",
+  "code_wrapper": "<?php\nrequire_once './vendor/autoload.php';\n{imports}\n{code}\n{print}",
   "code_wrapper_padding": 0,
   "method_name_style": "underscore",
 

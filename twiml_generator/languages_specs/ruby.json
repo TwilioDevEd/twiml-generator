@@ -6,7 +6,7 @@
   "voice_class": "Twilio::TwiML::VoiceResponse",
   "messaging_class": "Twilio::TwiML::MessagingResponse",
   "text_format": "{text}, ",
-  "attribute_name_style": "camelize",
+  "attribute_name_style": "underscore",
   "attribute_format": "{name}: {value}",
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",

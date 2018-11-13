@@ -23,10 +23,7 @@ class DefaultText:
 
 @PHP.register
 class Message(DefaultText):
-    @classmethod
-    def process(cls, verb, imports):
-        if not verb.text:
-            verb.text = ' '
+    pass
 
 
 @PHP.register

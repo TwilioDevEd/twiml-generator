@@ -8,7 +8,7 @@ from twiml_generator.specificity.common import attr_to_list, to_bytes, \
 
 def to_list(verb, attr_name, imports, **kwargs):
     attr_to_list(verb, attr_name, formatter="new []{{{}}}.ToList()", **kwargs)
-    if 'using System.Linq;' not in imports:
+    if attr_name in verb.attributes:
         imports.add('using System.Linq;')
 
 

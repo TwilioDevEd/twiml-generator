@@ -137,7 +137,7 @@ class TwimlCodeGenerator(object):
             imports = self.language_spec[import_kind] + '\n'
             if self.specific_imports:
                 imports += '\n'.join(self.specific_imports)
-            return imports + '\n'
+            return imports
 
     def output_new_variable(self, verb, appends=None):
         """Return a string to create a new tag that will contain other verbs."""
