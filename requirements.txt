@@ -1,4 +1,4 @@
-twilio==6.19.1
+twilio==6.33.0
 inflection==0.3.1
 yapf==0.16.2
 jsbeautifier==1.6.14
