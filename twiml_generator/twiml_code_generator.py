@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 
+from contextlib import suppress
 from pathlib import Path
 from lxml import etree
 from inflection import underscore
@@ -457,7 +458,8 @@ class TwimlCodeGenerator(object):
                 return p
 
         program_path = Path('Program.cs')
-        program_path.unlink()
+        with suppress(FileNotFoundError):
+            program_path.unlink()
         program_path.symlink_to(absolute_code_filepath)
 
         logger.debug('Running: {}'.format(' '.join(dotnet_run_command)))
