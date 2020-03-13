@@ -11,8 +11,8 @@ class Python(Language):
         """Python library specificities which requires to change the TwiML IR.
         """
         for verb, event in generator.twimlir:
-            if verb.is_ssml:
-                verb.name = f'ssml_{verb.name}'
+            if verb.name == 'break':
+                verb.name = 'break_'
             rename_attr(verb, 'from', 'from_')
             rename_attr(verb, 'for', 'for_')
 

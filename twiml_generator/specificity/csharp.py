@@ -67,7 +67,7 @@ class CSharp(Language):
             rename_attr(verb, 'for', 'for_')
 
             if verb.is_ssml:
-                verb.name = camelize(f'ssml_{verb.name}')
+                verb.name = camelize(verb.name)
 
             cls.verb_processing(verb, generator.specific_imports)
 
