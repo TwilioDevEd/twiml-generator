@@ -291,6 +291,13 @@ class Queue:
         to_uri(verb, 'url')
         to_bytes(verb, 'url')
 
+@CSharp.register
+class Refer:
+
+    @classmethod
+    def process(cls, verb, imports):
+        to_uri(verb, 'action')
+        to_bytes(verb, 'action')
 
 @CSharp.register
 class Sip(Evented):
