@@ -120,6 +120,11 @@ rbenv init
 ```
 
 Follow the instructions printed out from `rbenv init` for setting up the `rbenv` shell integration.
+
+**NOTE**: You must also add the output of `rbenv init` to your `~/.bash_profile`, even if you use another
+shell, such as `.zsh`. The `generator` script uses Python's `subprocess` module, which will
+only load your `bash_profile` to run commands.
+
 Then, install your desired ruby version and the Twilio helper library:
 
 ```
