@@ -17,10 +17,18 @@ A tool to help generate sample code for creating TwiML with Twilio's helper libr
 
 ## Using the tool
 
-You can use `./generator.py` to print out code from a TwiML file
+You can use `./generator.py` to print out code that is generated from a TwiML file:
+
+```bash
+$ ./generator.py assets/call_on_hold.xml -l python --verify
+```
+
+You can also use it to produce an output file containing the code:
 
 ```bash
 $ ./generator.py assets/call_on_hold.xml -l python
+# optionally specify where the output file should be written
+$ ./generator.py assets/call_on_hold.xml -out assets/call_on_hold.py -l python
 ```
 
 ## Using it as a Library
