@@ -8,13 +8,12 @@ class Python(Language):
 
     @classmethod
     def clean(cls, generator) -> None:
-        """Python library specificities which requires to change the TwiML IR.
-        """
+        """Python library specificities which requires to change the TwiML IR."""
         for verb, event in generator.twimlir:
-            if verb.name == 'break':
-                verb.name = 'break_'
-            rename_attr(verb, 'from', 'from_')
-            rename_attr(verb, 'for', 'for_')
+            if verb.name == "break":
+                verb.name = "break_"
+            rename_attr(verb, "from", "from_")
+            rename_attr(verb, "for", "for_")
 
             cls.verb_processing(verb, generator.specific_imports)
 
@@ -23,15 +22,14 @@ class Python(Language):
         super().verb_processing(verb, imports)
 
         for name, value in verb.attributes.items():
-            if value in ['true', 'false']:
+            if value in ["true", "false"]:
                 verb.attributes[name] = camelize(value)
                 to_bytes(verb, name)
 
 
 @Python.register
 class Play:
-
     @classmethod
     def process(cls, verb, imports):
         if not verb.text:
-            verb.text = ' '
+            verb.text = " "

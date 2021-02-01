@@ -7,8 +7,7 @@ def rename_attr(verb, attr_name, new_name):
         verb.attributes[new_name] = verb.attributes.pop(attr_name)
 
 
-def attr_to_list(verb, attr_name, formatter='{}', force=False,
-                 transform=None):
+def attr_to_list(verb, attr_name, formatter="{}", force=False, transform=None):
     """Helper to convert string to language specific list or array
 
     :arg formatter: String to insert the values depending on language
@@ -17,17 +16,21 @@ def attr_to_list(verb, attr_name, formatter='{}', force=False,
     :arg transform: function to modify each value before building the list
     :returns: True if converted to array
     """
-    if attr_name in verb.attributes \
-            and not isinstance(verb.attributes[attr_name], bytes):
-        if ' ' in verb.attributes[attr_name] or force:
+    if attr_name in verb.attributes and not isinstance(
+        verb.attributes[attr_name], bytes
+    ):
+        if " " in verb.attributes[attr_name] or force:
             verb.attributes[attr_name] = formatter.format(
-                ', '.join([callable(transform) and transform(value) or value
-                           for value in verb.attributes[attr_name].split(' ')])
+                ", ".join(
+                    [
+                        callable(transform) and transform(value) or value
+                        for value in verb.attributes[attr_name].split(" ")
+                    ]
+                )
             )
             return True
         value = verb.attributes[attr_name]
-        verb.attributes[attr_name] = callable(transform) and transform(value) \
-                                     or value
+        verb.attributes[attr_name] = callable(transform) and transform(value) or value
     return False
 
 
@@ -36,9 +39,10 @@ def to_bytes(verb, attr_name):
 
     * Works as mark to not wrap it as string on code generation
     """
-    if attr_name in verb.attributes \
-            and not isinstance(verb.attributes[attr_name], bytes):
-        verb.attributes[attr_name] = verb.attributes[attr_name].encode('utf-8')
+    if attr_name in verb.attributes and not isinstance(
+        verb.attributes[attr_name], bytes
+    ):
+        verb.attributes[attr_name] = verb.attributes[attr_name].encode("utf-8")
 
 
 class Language:
@@ -46,7 +50,7 @@ class Language:
 
     @classmethod
     def register(cls, class_: Type) -> Type:
-        cls._classes[getattr(class_, 'name', class_.__name__)] = class_
+        cls._classes[getattr(class_, "name", class_.__name__)] = class_
         return class_
 
     @classmethod
