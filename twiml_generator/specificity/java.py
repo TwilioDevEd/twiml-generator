@@ -81,6 +81,9 @@ class Dial:
         to_enum(verb, 'record')
         to_bytes(verb, 'record')
 
+        to_enum(verb, 'recordingTrack')
+        to_bytes(verb, 'recordingTrack')
+
         to_enum(verb, 'trim')
         to_bytes(verb, 'trim')
 
@@ -175,6 +178,9 @@ class Pay:
     def process(cls, verb, imports):
         to_enum(verb, 'language')
         to_bytes(verb, 'language')
+
+        to_enum(verb, 'tokenType')
+        to_bytes(verb, 'tokenType')
 
         to_list(verb, 'validCardTypes', imports,
                 transform=enum_builder(verb, 'validCardTypes'))
