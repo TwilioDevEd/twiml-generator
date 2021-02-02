@@ -119,3 +119,6 @@ ENV/
 
 # VSCode settings
 .vscode
+
+# Vim
+*.swp
