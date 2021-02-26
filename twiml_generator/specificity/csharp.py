@@ -246,6 +246,9 @@ class Dial:
         to_uri(verb, 'recordingStatusCallback')
         to_bytes(verb, 'recordingStatusCallback')
 
+        to_uri(verb, 'referUrl')
+        to_bytes(verb, 'referUrl')
+
         to_list(verb, 'recordingStatusCallbackEvent', imports, force=True,
                 transform=enum_builder(verb, 'Event'))
         to_bytes(verb, 'recordingStatusCallbackEvent')
