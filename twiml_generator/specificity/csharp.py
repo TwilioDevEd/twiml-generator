@@ -188,7 +188,13 @@ class Evented:
 
 @CSharp.register
 class Number(Evented):
-    pass
+
+    @classmethod
+    def process(cls, verb, imports):
+        super().process(verb, imports)
+
+        to_uri(verb, 'url')
+        to_bytes(verb, 'url')
 
 
 @CSharp.register
