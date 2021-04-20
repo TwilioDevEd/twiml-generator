@@ -5,6 +5,8 @@ def rename_attr(verb, attr_name, new_name):
     """Rename attribute if found"""
     if attr_name in verb.attributes:
         verb.attributes[new_name] = verb.attributes.pop(attr_name)
+    elif getattr(verb, 'method_name', None) == attr_name:
+        setattr(verb, 'method_name', new_name)
 
 
 def attr_to_list(verb, attr_name, formatter='{}', force=False,

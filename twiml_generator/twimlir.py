@@ -79,7 +79,7 @@ class TwimlIR(object):
                 verb = TwimlIRVerb(
                     name=twiml_verb.tag,
                     attributes=self.clean_attributes(twiml_verb.tag, twiml_verb.attrib),
-                    text=self.__class__.clean_text(twiml_verb.text),
+                    text=self.clean_text(twiml_verb.text),
                     parent=latest_verb,
                     tail=twiml_verb.tail,
                     is_ssml=processing_ssml
@@ -106,8 +106,10 @@ class TwimlIR(object):
     @staticmethod
     def clean_text(text):
         """Remove unecessary blank space from the text and keep a newline in between."""
-        if text is not None and text != '':
-            return '\\n'.join([line.strip() for line in text.strip().split('\n')])
+        return (
+            None if text is None or text.strip() == ''
+            else '\\n'.join(line.strip() for line in text.strip().split('\n'))
+        )
 
     def clean_attributes(self, verb, attributes):
         """Cast attributes value to the proper type."""

@@ -41,15 +41,20 @@ class Java(Language):
 
         for verb, event in generator.twimlir:
             if verb.is_ssml:
-                verb.variable_name = camelize('ssml_' + verb.name,
-                                              uppercase_first_letter=False)
+                verb.variable_name = camelize(
+                    f'ssml_{verb.name}', uppercase_first_letter=False
+                )
+                verb.method_name = camelize(verb.name, uppercase_first_letter=False)
                 verb.name = camelize('ssml_' + verb.name)
                 import_name = f"import com.twilio.twiml.voice.{verb.name};"
                 generator.specific_imports.add(import_name)
+            if verb.name == 'Sip' and verb.parent.name == 'Refer':
+                verb.name = 'ReferSip'
 
             cls.verb_processing(verb, generator.specific_imports)
 
             rename_attr(verb, 'for', 'for_')
+            rename_attr(verb, 'break', 'break_')
 
 
 @Java.register
@@ -247,3 +252,11 @@ class Enqueue:
     @classmethod
     def process(cls, verb, imports):
         rename_attr(verb, 'queueName', 'name')
+
+
+@Java.register
+class ReferSip:
+
+    @classmethod
+    def process(cls, verb, imports):
+        verb.method_name = 'sip'
