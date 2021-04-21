@@ -229,14 +229,14 @@ class TwimlCodeGenerator(object):
         return verb.variable_name
 
     def method_for_verb(self, verb):
+        method_name = getattr(verb, 'method_name', verb.name)
         """Return a formated method name for a given verb."""
         if self.language_spec.get('method_name_style') == 'camelize':
-            method_name = camelize(verb.name)
+            method_name = camelize(method_name)
         elif self.language_spec.get('method_name_style') == 'pascalize':
-            method_name = pascalize(verb.name)
+            method_name = pascalize(method_name)
         else:
-            method_name = verb.name.lower()
-
+            method_name = method_name.lower()
         return method_name
 
     def class_for_verb(self, verb):
@@ -469,10 +469,15 @@ class TwimlCodeGenerator(object):
 
     def etree_element_eq(self, a, b):
         """Return True if two etree (a and b) are equal."""
-        return (a.tag == b.tag
-                and a.tail == b.tail
-                and a.attrib == b.attrib
-                and (TwimlIR.clean_text(a.text) == TwimlIR.clean_text(b.text)
-                     if a.text and b.text else a.text == b.text)
-                and len(a) == len(b)
-                and all(self.etree_element_eq(c1, c2) for c1, c2 in zip(a, b)))
+        return (
+            a.tag == b.tag
+            and a.attrib == b.attrib
+            and (
+                TwimlIR.clean_text(a.tail) == TwimlIR.clean_text(b.tail)
+            )
+            and (
+                TwimlIR.clean_text(a.text) == TwimlIR.clean_text(b.text)
+            )
+            and len(a) == len(b)
+            and all(self.etree_element_eq(c1, c2) for c1, c2 in zip(a, b))
+        )
