@@ -2,7 +2,6 @@
   "language": "python",
   "extension": ".py",
   "method_name_style": "underscore",
-  "applicationsid_class": "ApplicationSid",
   "voice_class": "VoiceResponse",
   "messaging_class": "MessagingResponse",
   "text_format": "{text}, ",
