@@ -1,8 +1,8 @@
 {
   "language": "python",
   "extension": ".py",
-  
-  
+  "method_name_style": "underscore",
+  "applicationsid_class": "ApplicationSid",
   "voice_class": "VoiceResponse",
   "messaging_class": "MessagingResponse",
   "text_format": "{text}, ",
@@ -11,7 +11,6 @@
   "chain_calls": false,
   "code_wrapper": "{imports}\n{code}\n{print}",
   "code_wrapper_padding": 0,
-
   "add_imports": "single_line",
   "import_voice": "from twilio.twiml.voice_response import {imports}",
   "import_messaging": "from twilio.twiml.messaging_response import {imports}",

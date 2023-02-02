@@ -235,6 +235,8 @@ class TwimlCodeGenerator(object):
             method_name = camelize(method_name)
         elif self.language_spec.get('method_name_style') == 'pascalize':
             method_name = pascalize(method_name)
+        elif self.language_spec.get('method_name_style') == 'underscore':
+            method_name = underscore(method_name)
         else:
             method_name = method_name.lower()
         return method_name
