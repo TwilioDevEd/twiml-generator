@@ -31,55 +31,83 @@ In order to use the testing functionality, you need to install each Helper Libra
 
 - [twilio-csharp GitHub Repo](https://github.com/twilio/twilio-csharp/)
 - Requirements: 
-  - .NET Core 1.0+
-- Installation: 
-  - From within this project's root directory, run the following command: 
-  ```bash
-  dotnet add package Twilio
-  ```
+  - [.NET Core 1.0+](https://dotnet.microsoft.com/download/dotnet-core)
+- `twilio-csharp` installation: 
+  - From within this project's root directory run the following command: 
+    ```bash
+    dotnet add package Twilio
+    ```
   
 #### twilio-java
 
 - [twilio-java GitHub Repo](https://github.com/twilio/twilio-java)
 - Requirements: 
   - Java 8
-  - Maven
-    - I think you can install this with Homebrew? 
+    
+    To install Java 8, run the following command: 
     
     ```bash
-    brew cask install java
-    brew install maven
+    brew tap adoptopenjdk/openjdk
+    brew install adoptopenjdk/openjdk/adoptopenjdk8 --cask
     ```
-- Installation: 
-  - Download `.jar` file for the desired version of Twilio SDK
+
+- `twilio-java` installation: 
+
     1. Go to [mvnrepository.com](https://mvnrepository.com/artifact/com.twilio.sdk/twilio) and click on the version of the Helper Library you need. 
     1. In the table at the top of the page, find **Files** and click on **jar** (may need to click on **View All** and select the `twilio-<version number>-jar-with-dependencies.jar` file?)
-    1. Place the `.jar` file in this project's `./lib/` directory.
+    1. Create a `lib` directory in the root of this project and place the `.jar` file in it.
 
 #### twilio-python
 
 - [twilio-python GitHub Repo](https://github.com/twilio/twilio-python)
 - Requirements: 
   - Python 3.7+
-- Installation: 
-  - Install `twilio` sdk with `pip` (already in requirements.txt)
-  (does this work with pip3? idk)
 
-  ```bash
-  pip3 install twilio
-  ```
+- `twilio-python` installation: 
+  
+  - Install `twilio` sdk with `pip` 
+  
+    (**Note:** If you followed the Installation instructions for this repo, `twilio-python` is already installed!)
+
+    ```bash
+    pip3 install twilio
+    ```
 
 #### twilio-ruby
 
 - [twilio-ruby GitHub Repo](https://github.com/twilio/twilio-ruby)
 
 - Requirements: 
-  - Ruby 3.1
-  - RubyGems
+  - Ruby 3.1 and [rbenv](https://github.com/rbenv/rbenv)
 
-- Installation: 
-  - Install ruby and `twilio-ruby` gem
-  - (In the root ?)
+    To install `rbenv`, run the following command: 
+
+      ```bash
+      brew install rbenv
+      rbenv init
+      ```
+      Follow the instructions printed out from rbenv init for setting up the rbenv shell integration.
+
+      **NOTE:** You must also add the output of `rbenv init` to your `~/.bash_profile`, even if you use another shell, such as `.zsh`. The generator script uses Python's subprocess module, which will only load your `bash_profile` to run commands.
+
+      Then, install your desired Ruby version:
+
+      ```bash
+      rbenv install 2.6.3  # or other preferred version; the twilio-ruby works with ruby >1.9.3
+      rbenv global 2.6.3  # or whichever version you installed
+      rbenv rehash  # installs shims -- run this after installing a new ruby version with rbenv
+      gem update --system  # update the RubyGems system software
+      ```
+
+- `twilio-ruby` installation: 
+
+  Run the following command: 
+
+  ```bash
+  gem install twilio-ruby
+  ```
+
+  or install a specific `twilio-ruby` version: 
 
   ```bash
   gem install twilio-ruby -v 5.76.0
@@ -90,20 +118,44 @@ In order to use the testing functionality, you need to install each Helper Libra
 - [twilio-php GitHub Repo](https://github.com/twilio/twilio-php/)
 - Requirements: 
   - PHP 8
+    
+    To install PHP 8, run the following command: 
+    ```
+    brew install php
+    ```
+
   - [Composer](https://getcomposer.org/download/)
-- Installation: 
-  - In the root directory of this project, run the following command: 
+    
+    Run the following command: 
+    
+    ```bash
+    brew install composer
+    ```
+
+- `twilio-php` installation: 
+
+  In the root directory of this project, run the following command: 
+  
   ```bash
   composer require twilio/sdk
   ```
+  This will create `composer.json` and `composer.lock` files.
 
 #### twilio-node
 
 - [twilio-node GitHub Repo](https://github.com/twilio/twilio-node/)
 - Requirements: 
   - Node.js 14+
-- Installation: 
-  - In the root directory of this project, run the following command: 
+  
+    To install Node.js, run the following command: 
+  
+    ```bash
+    brew install node
+    ```
+
+- `twilio-node` installation: 
+
+  In the root directory of this project, run the following command: 
     
   ```bash
   npm install twilio
@@ -111,9 +163,24 @@ In order to use the testing functionality, you need to install each Helper Libra
 
 #### twilio-go (Coming soon?)
 
-- [twilio-go GitHub Repo](https://github.com/twilio/twilio-go)
+[twilio-go GitHub Repo](https://github.com/twilio/twilio-go)
 
 </details>
+
+## Installation
+
+Create a Python virtual environment:
+
+```bash
+python3 -m venv venv
+```
+
+Activate the environment and install requirements:
+
+```bash
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ## Use the tool to create and/or verify Helper Library code
 
