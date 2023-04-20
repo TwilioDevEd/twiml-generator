@@ -3,7 +3,7 @@
 </a>
 
 # TwiML Generator
-A tool to help generate sample code for creating TwiML with Twilio's helper libraries
+A tool to help generate sample code for creating TwiML with Twilio's Helper Libraries
 
 ## Supported Languages
 
@@ -16,61 +16,6 @@ A tool to help generate sample code for creating TwiML with Twilio's helper libr
 | Python | 6.x |
 
 
-<!-- TODO  -->
-Create file set that is properly-structured for api-snippets/twiml
-- enter a filename (kebab-cased) that describes the example
-- create a directory w/ filename
-- create a sub-directory called output
-- create a file called <filename> with `.twiml` extension
-- enter TwiML 
-- put into `.twiml` file
-- create `meta.json` file
-- enter `title` / description
-- put `title` into `meta.json` file
-- run generator.py for each helper library and output into directory
-
-
-## Using the tool
-
-You can use `./generator.py` to print out and save code that is generated from a TwiML file:
-
-```bash
-$ ./generator.py assets/call_on_hold.xml -l python
-# optionally specify where the output file should be written. If not specified,
-# it will be written to a /generators/<language> directory
-$ ./generator.py assets/call_on_hold.xml -out assets/call_on_hold.py -l python
-```
-
-You can also skip the code generation and verify that an existing code sample correctly matches
-the TwiML definition.
-
-```bash
-# the first file is the TwiML example, and the second file is the code to verify
-$ ./generator.py assets/call_on_hold.xml -out assets/call_on_hold.py -l python --verify
-```
-
-## Using it as a Library
-
-A small example on how to use it as a library in your Python code:
-
-```python
-from twiml_code_generator import TwimlCodeGenerator
-
-my_twiml_file = 'assets/record_voicemail.xml'
-code_generator = TwimlCodeGenerator(my_twiml_file, language='python')
-
-# Print out the generated code
-print(code_generator)
-
-# Write a file with the generated code
-code_generator.write_code()
-
-# Run the generated code and verify the output xml against the source
-# Only: Python, PHP, Node
-# TODO: ADD other helper libraries to code_generator?
-code_generator.verify()
-```
-
 ## Requirements
 The generator tool will try to test the generated snippets using a local
 environment for every language's SDK version.
@@ -78,6 +23,8 @@ environment for every language's SDK version.
 In order to use the testing functionality, you need to install each Helper Library. 
 
 ### Helper Library Installation
+<details>
+  <summary>Click to expand</summary>
 
 TODO: Instructions for how to check if you have these things installed? 
 
@@ -177,10 +124,139 @@ Installation:
 
 [twilio-go GitHub Repo](https://github.com/twilio/twilio-go)
 
+</details>
+
+
+
+## Use the tool to create and/or verify Helper Library code
+
+You can run the tool via the command line or use it as a Python Library. 
+
+For either option, you first need to create a TwiML file. 
+
+### Create a `.xml` file containing the TwiML for which you want to generate Helper Library code. 
+
+- Include the XML declaration line at the top of the file. 
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  ```
+
+- `<Response>` and `</Response>` tags must be present. 
+
+- :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware once Twilio executes the TwiML on a live call. Therefore: 
+  - Make sure that you are including any required attributes and/or a body if necessary. 
+  - If any attribute implies the use of another attribute, make sure to include it in the example. E.g. You wouldn't/shouldn't use `statusCallbackEvent` without also using the `statusCallback` attribute. 
+  - Don't force errors onto our customers. Not sure if the TwiML actually works? Hook up a Twilio Phone Number to a TwiML Bin and test it out yourself.
+
+- Use `example.com` domains for any sample URLs. 
+
+  :warning: When you add the TwiML file to the [api-snippets repo](https://github.com/TwilioDevEd/api-snippets/tree/master/twiml), you need to change the file extension to `.twiml`. 
+
+  :no_entry: This TwiML document will cause an error because the required `callerId` attribute is missing.
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Response>
+      <Dial>
+          <Number>15557778888</Number>
+      </Dial>
+  </Response>
+  ```
+
+  :white_check_mark: This TwiML document will work!
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Response>
+      <Dial callerId="+15557775555">
+          <Number>15557778888</Number>
+      </Dial>
+  </Response>
+  ```
+
+### Generate the Helper Library code via the command line
+
+  You can generate the Helper Library code by running a the `generator.py` file.
+
+  In your terminal, run a command with following format: 
+  
+  `./generator.py <your .twiml filepath> -l <Helper Library language>`
+  
+  #### Languages
+
+  The `-l` option specifies the Helper Library for which you wish to generate code. The allowed values are: 
+  - `python` 
+  - `ruby`
+  - `csharp`
+  - `java`
+  - `php`
+  - `node`
+  
+  Example: 
+  ```bash
+  ./generator.py assets/dial-basic.xml -l node
+  ```
+
+  #### Output location 
+
+  By default, the tool outputs the Helper Library code into the `/generators/<Helper Library language>` directory. 
+
+  You can specify an output location with the `-out` flag: 
+
+  ```bash
+  ./generator.py <your .twiml filepath> -out <output filepath> -l <Helper Library language>
+  ```
+
+  Example: 
+  ```bash
+  ./generator.py assets/dial-basic.xml -out ./assets/dial-basic/dial-basic.4.x.js -l node
+  ```
+
+  :warning: When you add the Helper Library code files to the [api-snippets repo](https://github.com/TwilioDevEd/api-snippets/tree/master/twiml), the file extension must include the Helper Library version, e.g. `some-example.4.x.js`.  
+
+  
+### Verify existing Helper Library code via the command line
+
+This tool will automatically verify each code sample as it is created. You can also test an existing code sample without generating new sample code with the `--verify` flag. 
+
+The format is:
+
+  `./generator.py <filepath of TwiML file> -out <filepath of code to verify> -l <Helper Library language> --verify`
+
+Example: 
+```bash
+./generator.py assets/call_on_hold.xml -out assets/call_on_hold.py -l python --verify
+```
+
+### Use the tool as a Python library
+
+Below is a small example on how to use this tool in your Python code:
+
+```python
+from twiml_code_generator import TwimlCodeGenerator
+
+my_twiml_file = 'assets/record_voicemail.xml'
+code_generator = TwimlCodeGenerator(my_twiml_file, language='python')
+
+# Print out the generated code
+print(code_generator)
+
+# Write a file with the generated code
+code_generator.write_code()
+
+# Run the generated code and verify the output xml against the source
+# Only: Python, PHP, Node
+# TODO: ADD other helper libraries to code_generator.verify?
+code_generator.verify()
+```
 
 ## Updating the project for new Helper Library Versions
 
 (Coming soon)
+
+TODO: Checking changelogs for breaking changes? 
+- SB Ticket to check on releases every two weeks to update this? (or DevEd Eng people)
 
 ## License
 MIT
