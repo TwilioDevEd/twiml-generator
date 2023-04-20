@@ -130,7 +130,7 @@ For either option, you first need to create a TwiML file.
 
 - `<Response>` and `</Response>` tags must be present. 
 - Use `example.com` domains for any sample URLs. 
-- :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware once Twilio executes the TwiML on a live call. Therefore: 
+- :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware of errors once Twilio executes the TwiML on a live call. Therefore: 
   - Make sure that you are including any required attributes and/or a body if necessary. 
   - If any attribute implies the use of another attribute, make sure to include it in the example. E.g. You wouldn't/shouldn't use `statusCallbackEvent` without also using the `statusCallback` attribute. 
   - Don't force errors onto our customers. Not sure if the TwiML actually works? Hook up a Twilio Phone Number to a TwiML Bin and test it out yourself.
@@ -139,7 +139,7 @@ For either option, you first need to create a TwiML file.
 
 ### Generate the Helper Library code via the command line
 
-  You can generate the Helper Library code by running a the `generator.py` file.
+  You can generate the Helper Library code by running the `generator.py` file.
 
   In your terminal, run a command with following format: 
   
