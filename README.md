@@ -30,32 +30,28 @@ TODO: Instructions for how to check if you have these things installed?
 
 #### twilio-csharp
 
-[twilio-csharp GitHub Repo](https://github.com/twilio/twilio-csharp/)
-
-Requirements: 
+- [twilio-csharp GitHub Repo](https://github.com/twilio/twilio-csharp/)
+- Requirements: 
   - .NET Core 1.0+
- 
-Installation: 
+- Installation: 
   - From within this project's root directory, run the following command: 
-    ```bash
-    dotnet add package Twilio
-    ```
+  ```bash
+  dotnet add package Twilio
+  ```
   
 #### twilio-java
 
-[twilio-java GitHub Repo](https://github.com/twilio/twilio-java)
-
-Requirements: 
-- Java 8
-- Maven
-  - I think you can install this with Homebrew? 
+- [twilio-java GitHub Repo](https://github.com/twilio/twilio-java)
+- Requirements: 
+  - Java 8
+  - Maven
+    - I think you can install this with Homebrew? 
     
     ```bash
     brew cask install java
     brew install maven
     ```
-
-Installation: 
+- Installation: 
   - Download `.jar` file for the desired version of Twilio SDK
     1. Go to [mvnrepository.com](https://mvnrepository.com/artifact/com.twilio.sdk/twilio) and click on the version of the Helper Library you need. 
     1. In the table at the top of the page, find **Files** and click on **jar** (may need to click on **View All** and select the `twilio-<version number>-jar-with-dependencies.jar` file?)
@@ -63,12 +59,10 @@ Installation:
 
 #### twilio-python
 
-[twilio-python GitHub Repo](https://github.com/twilio/twilio-python)
-
-Requirements: 
+- [twilio-python GitHub Repo](https://github.com/twilio/twilio-python)
+- Requirements: 
   - Python 3.7+
-
-Installation: 
+- Installation: 
   - Install `twilio` sdk with `pip` (already in requirements.txt)
   (does this work with pip3? idk)
 
@@ -78,29 +72,27 @@ Installation:
 
 #### twilio-ruby
 
-[twilio-ruby GitHub Repo](https://github.com/twilio/twilio-ruby)
+- [twilio-ruby GitHub Repo](https://github.com/twilio/twilio-ruby)
 
-Requirements: 
+- Requirements: 
   - Ruby 3.1
   - RubyGems
 
-Installation: 
+- Installation: 
   - Install ruby and `twilio-ruby` gem
   - (In the root ?)
 
-    ```bash
-    gem install twilio-ruby -v 5.76.0
-    ```
+  ```bash
+  gem install twilio-ruby -v 5.76.0
+  ```
 
 #### twilio-php
 
-[twilio-php GitHub Repo](https://github.com/twilio/twilio-php/)
-
-Requirements: 
-- PHP 8
-- [Composer](https://getcomposer.org/download/)
-
-Installation: 
+- [twilio-php GitHub Repo](https://github.com/twilio/twilio-php/)
+- Requirements: 
+  - PHP 8
+  - [Composer](https://getcomposer.org/download/)
+- Installation: 
   - In the root directory of this project, run the following command: 
   ```bash
   composer require twilio/sdk
@@ -108,21 +100,19 @@ Installation:
 
 #### twilio-node
 
-[twilio-node GitHub Repo](https://github.com/twilio/twilio-node/)
-
-Requirements: 
+- [twilio-node GitHub Repo](https://github.com/twilio/twilio-node/)
+- Requirements: 
   - Node.js 14+
-
-Installation: 
+- Installation: 
   - In the root directory of this project, run the following command: 
     
-    ```bash
-    npm install twilio
-    ```
+  ```bash
+  npm install twilio
+  ```
 
 #### twilio-go (Coming soon?)
 
-[twilio-go GitHub Repo](https://github.com/twilio/twilio-go)
+- [twilio-go GitHub Repo](https://github.com/twilio/twilio-go)
 
 </details>
 
