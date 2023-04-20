@@ -209,7 +209,7 @@ For either option, you first need to create a TwiML file.
 
   You can generate the Helper Library code by running the `generator.py` file.
 
-  In your terminal, run a command with following format: 
+  In your terminal, run a command with the following format: 
   
   `./generator.py <your .xml filepath> -l <Helper Library language>`
   
