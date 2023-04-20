@@ -14,7 +14,7 @@ A tool to help generate sample code for creating TwiML with Twilio's Helper Libr
 | [twilio-node](https://github.com/twilio/twilio-node/) | 3.x |
 | [twilio-php](https://github.com/twilio/twilio-php/) | 5.x |
 | [twilio-python](https://github.com/twilio/twilio-python/) | 6.x |
-| [twilio-ruby](https://github.com/twilio/twilio-ruby/) | ? |
+| [twilio-ruby](https://github.com/twilio/twilio-ruby/) | 5.x |
 
 
 ## Requirements
@@ -25,7 +25,7 @@ In order to use the testing functionality, you need to install each Helper Libra
 
 ### Helper Library Installation
 <details>
-  <summary>Click to expand</summary>
+  <summary>Click to see installation instructions for each Helper Library and related dependencies</summary>
 
 #### twilio-csharp
 
@@ -198,7 +198,7 @@ For either option, you first need to create a TwiML file.
 
 - `<Response>` and `</Response>` tags must be present. 
 - Use `example.com` domains for any sample URLs. 
-- :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware of errors once Twilio executes the TwiML on a live call. Therefore: 
+- :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware of errors once Twilio executes the TwiML (e.g. during a call). Therefore: 
   - Make sure that you are including any required attributes and/or a body if necessary. 
   - If any attribute implies the use of another attribute, make sure to include it in the example. E.g. You wouldn't/shouldn't use `statusCallbackEvent` without also using the `statusCallback` attribute. 
   - Don't force errors onto our customers. Not sure if the TwiML actually works? Hook up a Twilio Phone Number to a TwiML Bin and test it out yourself.
@@ -277,7 +277,6 @@ code_generator.write_code()
 
 # Run the generated code and verify the output xml against the source
 # Only: Python, PHP, Node
-# TODO: ADD other helper libraries to code_generator.verify?
 code_generator.verify()
 ```
 
