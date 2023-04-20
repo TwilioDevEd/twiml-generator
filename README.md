@@ -5,15 +5,15 @@
 # TwiML Generator
 A tool to help generate sample code for creating TwiML with Twilio's Helper Libraries
 
-## Supported Languages
+## Supported Helper Library Versions
 
-| Language  | SDK Version |
+| Helper Library  | Version |
 | :-------------  |:------------- |
-| C# | 5.x |
-| Java | 7.x |
-| Node | 3.x |
-| PHP | 5.x |
-| Python | 6.x |
+| [twilio-csharp](https://github.com/twilio/twilio-csharp/) | 5.x |
+| [twilio-java](https://github.com/twilio/twilio-java/) | 7.x |
+| [twilio-node](https://github.com/twilio/twilio-node/) | 3.x |
+| [twilio-php](https://github.com/twilio/twilio-php/) | 5.x |
+| [twilio-python](https://github.com/twilio/twilio-python/) | 6.x |
 
 
 ## Requirements
@@ -25,8 +25,6 @@ In order to use the testing functionality, you need to install each Helper Libra
 ### Helper Library Installation
 <details>
   <summary>Click to expand</summary>
-
-TODO: Instructions for how to check if you have these things installed? 
 
 #### twilio-csharp
 
@@ -116,11 +114,9 @@ TODO: Instructions for how to check if you have these things installed?
 
 </details>
 
-
-
 ## Use the tool to create and/or verify Helper Library code
 
-You can run the tool via the command line or use it as a Python Library. 
+You can run the tool via the command line or use it as a Python library. 
 
 For either option, you first need to create a TwiML file. 
 
@@ -133,37 +129,13 @@ For either option, you first need to create a TwiML file.
   ```
 
 - `<Response>` and `</Response>` tags must be present. 
-
+- Use `example.com` domains for any sample URLs. 
 - :warning: Unfortunately, the Helper Libraries don't do any sort of enforcement around required or associated attributes. You will only be made aware once Twilio executes the TwiML on a live call. Therefore: 
   - Make sure that you are including any required attributes and/or a body if necessary. 
   - If any attribute implies the use of another attribute, make sure to include it in the example. E.g. You wouldn't/shouldn't use `statusCallbackEvent` without also using the `statusCallback` attribute. 
   - Don't force errors onto our customers. Not sure if the TwiML actually works? Hook up a Twilio Phone Number to a TwiML Bin and test it out yourself.
 
-- Use `example.com` domains for any sample URLs. 
-
-  :warning: When you add the TwiML file to the [api-snippets repo](https://github.com/TwilioDevEd/api-snippets/tree/master/twiml), you need to change the file extension to `.twiml`. 
-
-  :no_entry: This TwiML document will cause an error because the required `callerId` attribute is missing.
-
-  ```xml
-  <?xml version="1.0" encoding="UTF-8"?>
-  <Response>
-      <Dial>
-          <Number>15557778888</Number>
-      </Dial>
-  </Response>
-  ```
-
-  :white_check_mark: This TwiML document will work!
-
-  ```xml
-  <?xml version="1.0" encoding="UTF-8"?>
-  <Response>
-      <Dial callerId="+15557775555">
-          <Number>15557778888</Number>
-      </Dial>
-  </Response>
-  ```
+:warning: When you add the TwiML file to the [api-snippets repo](https://github.com/TwilioDevEd/api-snippets/tree/master/twiml), you need to change the file extension to `.twiml`. 
 
 ### Generate the Helper Library code via the command line
 
@@ -171,7 +143,7 @@ For either option, you first need to create a TwiML file.
 
   In your terminal, run a command with following format: 
   
-  `./generator.py <your .twiml filepath> -l <Helper Library language>`
+  `./generator.py <your .xml filepath> -l <Helper Library language>`
   
   #### Languages
 
@@ -194,7 +166,7 @@ For either option, you first need to create a TwiML file.
 
   You can specify an output location with the `-out` flag: 
 
-  ```bash
+  ```
   ./generator.py <your .twiml filepath> -out <output filepath> -l <Helper Library language>
   ```
 
@@ -244,9 +216,6 @@ code_generator.verify()
 ## Updating the project for new Helper Library Versions
 
 (Coming soon)
-
-TODO: Checking changelogs for breaking changes? 
-- SB Ticket to check on releases every two weeks to update this? (or DevEd Eng people)
 
 ## License
 MIT
