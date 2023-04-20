@@ -14,6 +14,7 @@ A tool to help generate sample code for creating TwiML with Twilio's Helper Libr
 | [twilio-node](https://github.com/twilio/twilio-node/) | 3.x |
 | [twilio-php](https://github.com/twilio/twilio-php/) | 5.x |
 | [twilio-python](https://github.com/twilio/twilio-python/) | 6.x |
+| [twilio-ruby](https://github.com/twilio/twilio-ruby/) | ? |
 
 
 ## Requirements
