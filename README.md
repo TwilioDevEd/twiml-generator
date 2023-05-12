@@ -245,6 +245,14 @@ For either option, you first need to create a TwiML file.
 
   :warning: When you add the Helper Library code files to the [api-snippets repo](https://github.com/TwilioDevEd/api-snippets/tree/master/twiml), the file extension must include the Helper Library version, e.g. `some-example.4.x.js`.  
 
+
+### Generate Messaging TwiML samples
+
+The vast majority of TwiML verbs are for Voice. If you would like to create a new TwiML code sample for Messaging rather than for Voice, you can pass in the `--messaging` flag:
+
+
+  `./generator.py <filepath of TwiML file> -out <filepath of code to verify> -l <Helper Library language> --messaging`
+
   
 ### Verify existing Helper Library code via the command line
 
