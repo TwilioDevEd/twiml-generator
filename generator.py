@@ -11,9 +11,10 @@ if __name__ == '__main__':
                         choices=['csharp', 'java', 'node', 'php', 'python', 'ruby'])
     parser.add_argument("-out", "--outpath",  help="[optional] Path to output file")
     parser.add_argument("--verify",  action='store_false', help="Only runs the verification")
+    parser.add_argument("--messaging", action='store_true',  help="Generate Messaging TwiML rather than Voice TwiML")
     args = parser.parse_args()
 
-    code_generator = TwimlCodeGenerator(args.twiml_filepath, code_filepath=args.outpath, language=args.language)
+    code_generator = TwimlCodeGenerator(args.twiml_filepath, code_filepath=args.outpath, language=args.language, is_messaging=args.messaging)
     if args.verify:
         code_generator.write_code()
         print(' CODE GENERATED '.center(80, '='))

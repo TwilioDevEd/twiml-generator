@@ -38,7 +38,7 @@ class TwimlCodeGenerator(object):
     """Class to generate the necessary code for outputing a given TwiML."""
     __specificities = Specificities()
 
-    def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python'):
+    def __init__(self, twiml_filepath, code_filepath=None, lib_filepath=None, language='python', is_messaging=False):
         self.language_spec = load_language_spec(language)
         self.twiml_filepath = Path(twiml_filepath)
         self.twimlir = TwimlIR(twiml_filepath)
@@ -48,6 +48,9 @@ class TwimlCodeGenerator(object):
             self.code_filepath = Path(code_filepath)
         else:
             self.code_filepath = code_filepath
+
+        if is_messaging:
+            self.twimlir.is_voice_response = False
 
         if lib_filepath:
             self.lib_filepath = Path(lib_filepath)
