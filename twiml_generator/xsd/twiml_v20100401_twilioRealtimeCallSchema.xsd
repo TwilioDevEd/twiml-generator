@@ -242,7 +242,7 @@
 
     <xs:simpleType name="voiceType">
         <xs:restriction base="xs:string">
-            <xs:pattern value="man|woman|male|female|alice|eve|brian|Polly\.[a-zA-Z]+" />
+            <xs:pattern value="man|woman|male|female|eve|brian|Polly\.[a-zA-Z]+" />
         </xs:restriction>
     </xs:simpleType>
 
