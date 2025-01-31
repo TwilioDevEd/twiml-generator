@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <ConversationRelay url="wss://mywebsocketserver.com/websocket">
+      <Parameter name="foo" value="bar"/>
+      <Parameter name="hint" value="Annoyed customer"/>
+    </ConversationRelay>
+  </Connect>
+</Response>
