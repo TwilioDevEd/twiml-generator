@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <ConversationRelay url="wss://mywebsocketserver.com/websocket">
+      <Language code="sv-SE" ttsProvider="amazon" voice="Elin-Neural" transcriptionProvider="google" speechModel="long"/>
+      <Language code="en-US" ttsProvider="google" voice="en-US-Journey-O" />
+    </ConversationRelay>
+  </Connect>
+</Response>
